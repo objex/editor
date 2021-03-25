@@ -1,6 +1,8 @@
 import {JSX as JSXInternal} from "preact"
 import svgTags from "./svgTags";
 
+import {mountXShow, XAttributes} from "./x-directives";
+
 type Child =
   | HTMLElement
   | Text
@@ -10,6 +12,7 @@ type Child =
 type Attributes =
   & JSXInternal.HTMLAttributes
   & JSXInternal.SVGAttributes
+  & XAttributes
   & Record<string, any>
 
 
@@ -19,7 +22,7 @@ type Attributes =
  * @param el - Element
  * @param child - Child node(s)
  */
-function appendChild(el: HTMLElement | SVGElement, child: Child | Child[]): void {
+export function appendChild(el: HTMLElement | SVGElement, child: Child | Child[]): void {
   /* Handle primitive types (including raw HTML) */
   if (typeof child === "string" || typeof child === "number") {
     el.innerHTML += child.toString()
@@ -32,6 +35,15 @@ function appendChild(el: HTMLElement | SVGElement, child: Child | Child[]): void
   } else if (Array.isArray(child)) {
     for (const node of child)
       appendChild(el, node)
+  }
+}
+
+/**
+ * Remove all the children of given element
+ */
+export function removeElementChildren(element: HTMLElement): void {
+  while (element.lastElementChild) {
+    element.removeChild(element.lastElementChild);
   }
 }
 
@@ -61,6 +73,11 @@ export function h(
   /* Set attributes, if any */
   if (attributes) {
     for (const attr of Object.keys(attributes)) {
+      if (attr === 'x-show') {
+        mountXShow(el, attributes[attr]);
+        continue;
+      }
+
       if (typeof attributes[attr] !== "boolean") {
         el.setAttribute(attr, attributes[attr]);
       } else if (attributes[attr]) {

@@ -1,5 +1,7 @@
-import { app, BrowserWindow } from "electron";
-import * as path from "path";
+// import { app, BrowserWindow } from "electron";
+// import * as path from "path";
+const {app, BrowserWindow} = require('electron');
+const path = require('path');
 
 function createWindow() {
   // Create the browser window.
@@ -7,13 +9,13 @@ function createWindow() {
     titleBarStyle: 'hiddenInset',
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      // preload: path.join(__dirname, "preload.js"),
     },
     width: 800,
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, "../index.html"));
+  mainWindow.loadFile(path.join(__dirname, "./index.html"));
 }
 
 // This method will be called when Electron has finished

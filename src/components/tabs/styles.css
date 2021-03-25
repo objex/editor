@@ -1,0 +1,15 @@
+.appbar__tabs {
+    @apply flex h-full;
+}
+
+.appbar__tab {
+    @apply px-4 py-3 h-full bg-gray-100 flex items-center text-gray-600 text-sm cursor-pointer;
+}
+
+.tab__close-btn {
+    @apply hover:bg-gray-300 rounded;
+}
+
+.tab__close-btn--icon {
+    @apply w-4 h-4 text-gray-500;
+}

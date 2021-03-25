@@ -1,4 +1,4 @@
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable} from "rxjs";
 
 /*------------------
  * Internals
@@ -15,7 +15,6 @@ export interface Tab {
   id: number;
   name: string;
   closable: boolean;
-  newlyAdd: boolean;
 }
 
 
@@ -23,21 +22,21 @@ export interface Tab {
  * Methods
  *--------------------*/
 
-export function addTab(tab: Omit<Tab, 'id' | 'newlyAdd'>) {
+export function addTab(tab: Omit<Tab, 'id'>) {
   let _tab: Tab = {
     id: _counter++,
-    newlyAdd: true,
     ...tab
   }
   tabs$.next([
     _tab,
-    ...tabs$.getValue().map(e => {
-      e.newlyAdd = false;
-      return e;
-    })
+    ...tabs$.getValue()
   ]);
 }
 
 export function closeTab(tabId: number) {
   tabs$.next(tabs$.getValue().filter(e => e.id !== tabId));
+}
+
+export function mountTabs(): Observable<Tab[]> {
+  return tabs$.pipe();
 }

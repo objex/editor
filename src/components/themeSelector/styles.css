@@ -1,0 +1,7 @@
+.theme-selector__btn {
+    @apply flex space-x-1 text-sm text-gray-600 items-center;
+}
+
+.theme-selector__btn--icon {
+    @apply w-3 h-3 text-gray-500;
+}
