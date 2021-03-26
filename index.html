@@ -9,145 +9,256 @@
   <title>Rabbito Editor</title>
 
   <link href="./dist/styles.css" rel="stylesheet">
+  <link rel="stylesheet" data-name="vs/editor/editor.main"
+        href="./node_modules/monaco-editor/min/vs/editor/editor.main.css">
 </head>
 <body>
 
 <div id="app"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.20.11/system.src.js" integrity="sha512-SRNxKWHywlnwyYiP2viUE2pZ+OfmGVC+GZIkdL3c2JJNwYyRLH9LmGddiXhZzMyzlrABprImAxSV6PAs1GErAg==" crossorigin="anonymous"></script>
-<script src="./dist/app.js" type="module"></script>
-<!--<div class="bg-gray-200 flex items-center pr-4" style="-webkit-app-region: drag;">-->
-<!--  <div class="w-20"></div>-->
+<script type="text/javascript">
+  window.languagePluginUrl = 'https://cdn.jsdelivr.net/pyodide/v0.16.1/full/';
+</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.16.1/full/pyodide.js"></script>
 
-<!--  <div class="flex h-full" style="-webkit-app-region: no-drag;">-->
-<!--    <div class="px-4 py-3 h-full flex items-center text-gray-600 text-sm cursor-pointer">-->
-<!--      <span>Home</span>-->
-<!--      <span class="w-2"></span>-->
-<!--    </div>-->
-<!--    <div class="px-4 py-3 h-full bg-gray-100 flex items-center text-gray-600 text-sm cursor-pointer bg-gray-">-->
-<!--      <span>RFC5545.md</span>-->
-<!--      <span class="w-2"></span>-->
-<!--      <button class="p-0.5 hover:bg-gray-300 rounded">-->
-<!--        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
-<!--          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>-->
-<!--        </svg>-->
-<!--      </button>-->
-<!--    </div>-->
-<!--  </div>-->
+<script>
+  let parserLoaded = false;
+  // init Pyodide
+  languagePluginLoader.then(async () => {
+    await pyodide.runPythonAsync(`
+      import micropip
+      micropip.install('markdown')
+      micropip.install('pymdown-extensions')
+      micropip.install('pygments')
+    `);
+    await pyodide.runPythonAsync(`
+      from markdown import Markdown
 
-<!--  <div class="flex-1"></div>-->
+      MD_EXTENSIONS = [
+        'footnotes',
+        'def_list',
+        'toc',
+        'pymdownx.arithmatex',
+        'pymdownx.betterem',
+        'pymdownx.caret',
+        'pymdownx.critic',
+        'pymdownx.details',
+        'pymdownx.inlinehilite',
+        'pymdownx.magiclink',
+        'pymdownx.mark',
+        'pymdownx.smartsymbols',
+        'pymdownx.superfences',
+        'pymdownx.tasklist',
+        'pymdownx.tilde',
+        'pymdownx.pathconverter',
+        'admonition',
+        'meta',
+        'codehilite',
+        'tables',
+      ]
+      MD_EXTENSIONS_CONFIG = {
+        'pymdownx.pathconverter': {
+          'base_path': '/GCS/POST_STORAGE_BUCKET/BLOG_NAME/POST_SLUG/',
+          'absolute': True,
+          'tags': 'img',
+        },
+        'toc': {
+          'marker': '',
+          'permalink': True,
+        },
+        'pymdownx.arithmatex': {
+          'generic': True,
+        },
+        'pymdownx.betterem': {
+          'smart_enable': 'all',
+        },
+        'pymdownx.tasklist': {
+          'custom_checkbox': 'true',
+        }
+      }
+    `);
 
-<!--  <div>-->
-<!--    <button class="flex space-x-1 text-sm text-gray-600 items-center">-->
-<!--      <span>Theme</span>-->
-<!--      <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
-<!--        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path>-->
-<!--      </svg>-->
-<!--    </button>-->
-<!--  </div>-->
-<!--</div>-->
+    parserLoaded = true;
+  });
 
-<!--<div id="app">-->
-<!--  <div class="flex item-center py-1.5 px-4 bg-gray-100 space-x-1.5">-->
-<!--    <button class="p-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">-->
-<!--      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"-->
-<!--           stroke-linecap="round" stroke-linejoin="round">-->
-<!--        <path d="M5.833 4.167h5a2.917 2.917 0 110 5.833h-5V4.167z"/>-->
-<!--        <path d="M10.833 10h.834a2.917 2.917 0 010 5.833H5.833V10"/>-->
-<!--      </svg>-->
-<!--    </button>-->
-<!--    <button class="p-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">-->
-<!--      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"-->
-<!--           stroke-linecap="round" stroke-linejoin="round">-->
-<!--        <path d="M9.167 4.167h5M5.833 15.833h5M11.667 4.167L8.333 15.833"/>-->
-<!--      </svg>-->
-<!--    </button>-->
-<!--    <button class="p-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">-->
-<!--      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"-->
-<!--           stroke-linecap="round" stroke-linejoin="round">-->
-<!--        <path d="M5.833 4.167v7.5a4.167 4.167 0 008.334 0v-7.5M3.333 10h13.334"/>-->
-<!--      </svg>-->
-<!--    </button>-->
+  function parseMd(md) {
+    return pyodide.runPython(`
+md = Markdown(extensions=MD_EXTENSIONS, extension_configs=MD_EXTENSIONS_CONFIG)
+md.convert("""${md}""")
+    `);
+  }
+</script>
 
-<!--    <div>-->
-<!--      <div class="w-px h-full bg-gray-300 mx-2"></div>-->
-<!--    </div>-->
+<script>var require = {paths: {'vs': './node_modules/monaco-editor/min/vs'}};</script>
+<script src="./node_modules/monaco-editor/min/vs/loader.js"></script>
+<script src="./node_modules/monaco-editor/min/vs/editor/editor.main.nls.js"></script>
+<script src="./node_modules/monaco-editor/min/vs/editor/editor.main.js"></script>
+<script src="./node_modules/monaco-markdown/umd/monaco-markdown.js"></script>
+<script>
+  setTimeout(() => {
+    monaco.editor.defineTheme('owl-light', {
+      base: 'vs',
+      inherit: true,
+      rules: [
+        {background: '#FBFBFB', foreground: '#24292E'},
+        {token: 'markup.heading', foreground: '#005CC5', fontStyle: "bold"},
+        {token: 'entity.name', foreground: '#005CC5', fontStyle: "bold"},
+        {token: 'keyword.js', foreground: '#D73A49'},
+        {token: 'operators', foreground: '#D73A49'},
+        {token: 'comment', foreground: '#6A737D'},
+        {token: 'tag', foreground: '#22863A'},
+        {token: 'number', foreground: '#005CC5'},
+        {token: 'string', foreground: '#032F62'},
+        {token: 'string.html', foreground: '#032F62'},
+        {token: 'string.yaml', foreground: '#032F62'},
+        {token: 'namespace.yaml', foreground: '#6F42C1'},
+        {token: 'type.yaml', foreground: '#22863A'},
+        {token: 'attribute.name', foreground: '#6F42C1'},
+        // {token: 'identifier.js', foreground: '#D73A49'},
+      ],
+      colors: {
+        'editor.foreground': '#2E3440',
+        // 'keyword': '#FBFBFB',
+        // 'editorCursor.foreground': '#8B0000',
+        // 'editor.lineHighlightBackground': '#0000FF20',
+        // 'editorLineNumber.foreground': '#008800',
+        // 'editor.selectionBackground': '#88000030',
+        // 'editor.inactiveSelectionBackground': '#88000015'
+      }
+    });
 
-<!--    <button class="p-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">-->
-<!--      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"-->
-<!--           stroke-linecap="round" stroke-linejoin="round">-->
-<!--        <path d="M16.333 15V8.333L14.667 10M3.833 5v10M10.5 5v10m-.833 0h1.666M3 15h1.667m-.834-5H10.5M3 5h1.667m5 0h1.666"/>-->
-<!--      </svg>-->
-<!--    </button>-->
-<!--    <button class="p-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">-->
-<!--      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"-->
-<!--           stroke-linecap="round" stroke-linejoin="round">-->
-<!--        <path d="M14.667 10A1.667 1.667 0 0118 10c0 .492-.348 1.098-.68 1.548l-2.653 3.453L18 15M3.833 5v10M10.5 5v10m-.833 0h1.666M3 15h1.667m-.834-5H10.5M3 5h1.667m5 0h1.666"/>-->
-<!--      </svg>-->
-<!--    </button>-->
-<!--    <button class="p-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">-->
-<!--      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"-->
-<!--           stroke-linecap="round" stroke-linejoin="round">-->
-<!--        <path d="M14.667 10a1.667 1.667 0 111.666 1.667 1.667 1.667 0 11-1.666 1.666M3.833 5v10M10.5 5v10m-.833 0h1.666M3 15h1.667m-.834-5H10.5M3 5h1.667m5 0h1.666"/>-->
-<!--      </svg>-->
-<!--    </button>-->
-<!--    <button class="p-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">-->
-<!--      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"-->
-<!--           stroke-linecap="round" stroke-linejoin="round">-->
-<!--        <path d="M17.167 15V8.333l-3.334 5H18M3.833 5v10M10.5 5v10m-.833 0h1.666M3 15h1.667m-.834-5H10.5M3 5h1.667m5 0h1.666"/>-->
-<!--      </svg>-->
-<!--    </button>-->
+    monaco.editor.setTheme('owl-light');
 
-<!--    <div>-->
-<!--      <div class="w-px h-full bg-gray-300 mx-2"></div>-->
-<!--    </div>-->
+    let editor = monaco.editor.create(window.editorEl, {
+      language: 'markdown-math',
+      wordWrap: 'on',
+      automaticLayout: true,
+      fontFamily: "'Fira Code'",
+      fontSize: 13,
+      fontLigatures: true,
+      // lineHeight: '20%',
+      theme: 'owl-light',
+      smoothScrolling: true,
+      minimap: {
+        enabled: false
+      },
+      value: [
+        `# Header 1 #
+## Header 2 ##
+### Header 3 ###             (Hashes on right are optional)
+## Markdown plus h2 with a custom ID ##   {#id-goes-here}
+[Link back to H2](#id-goes-here)
 
-<!--    <button class="p-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">-->
-<!--      <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">-->
-<!--        <path d="M6.667 4.167c0-.46.373-.834.833-.834h9.167a.833.833 0 010 1.667H7.5a.833.833 0 01-.833-.833zM3.75 5.417a1.25 1.25 0 110-2.5 1.25 1.25 0 010 2.5zm0 5.833a1.25 1.25 0 110-2.5 1.25 1.25 0 010 2.5zm0 5.75a1.25 1.25 0 110-2.5 1.25 1.25 0 010 2.5zm2.917-7c0-.46.373-.833.833-.833h9.167a.833.833 0 010 1.666H7.5A.833.833 0 016.667 10zm0 5.833c0-.46.373-.833.833-.833h9.167a.833.833 0 010 1.667H7.5a.833.833 0 01-.833-.834z"/>-->
-<!--      </svg>-->
-<!--    </button>-->
-<!--    <button class="p-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">-->
-<!--      <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">-->
-<!--        <path d="M6.667 4.167c0-.46.373-.834.833-.834h9.167a.833.833 0 010 1.667H7.5a.833.833 0 01-.833-.833zM4.167 2.5V5H5v.833H2.5V5h.833V3.333H2.5V2.5h1.667zM2.5 11.667V9.583h1.667v-.416H2.5v-.834H5v2.084H3.333v.416H5v.834H2.5zm1.667 4.583H2.5v-.833h1.667V15H2.5v-.833H5V17.5H2.5v-.833h1.667v-.417zm2.5-6.25c0-.46.373-.833.833-.833h9.167a.833.833 0 010 1.666H7.5A.833.833 0 016.667 10zm0 5.833c0-.46.373-.833.833-.833h9.167a.833.833 0 010 1.667H7.5a.833.833 0 01-.833-.834z"/>-->
-<!--      </svg>-->
-<!--    </button>-->
-<!--    <button class="p-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">-->
-<!--      <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">-->
-<!--        <path d="M3.82 14.434c-.86-.911-1.32-1.934-1.32-3.591 0-2.736 1.801-5.206 4.482-6.568a.675.675 0 01.87.248c.225.347.103.81-.244 1.037C5.4 6.997 4.928 8.726 4.73 9.852c.447-.232 1.033-.313 1.607-.26 1.504.14 2.689 1.374 2.689 2.908a2.917 2.917 0 01-2.917 2.917c-.894 0-1.749-.409-2.29-.983zm8.332 0c-.858-.911-1.319-1.934-1.319-3.591 0-2.736 1.801-5.206 4.482-6.568a.675.675 0 01.87.248c.225.347.103.81-.243 1.037-2.209 1.437-2.68 3.166-2.879 4.292.448-.232 1.034-.313 1.608-.26 1.503.14 2.688 1.374 2.688 2.908a2.917 2.917 0 01-2.917 2.917c-.894 0-1.749-.409-2.29-.983z"/>-->
-<!--      </svg>-->
-<!--    </button>-->
-<!--    <button class="p-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">-->
-<!--      <svg class="h-5 w-5" viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">-->
-<!--        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>-->
-<!--        <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />-->
-<!--        <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />-->
-<!--      </svg>-->
-<!--    </button>-->
+\`\`\`js
+var x = "string";
+function f() {
+  return x;
+}
+\`\`\`
 
-<!--    <div>-->
-<!--      <div class="w-px h-full bg-gray-300 mx-2"></div>-->
-<!--    </div>-->
+<!-- html madness -->
+<div class="custom-class" markdown="1">
+  <div>
+    nested div
+  </div>
 
-<!--    <button class="p-0.5 rounded text-gray-500 hover:bg-gray-200 transition duration-100">-->
-<!--      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">-->
-<!--        <path d="M12.5 6.667h.008M14.167 3.333H5.833a2.5 2.5 0 00-2.5 2.5v8.334a2.5 2.5 0 002.5 2.5h8.334a2.5 2.5 0 002.5-2.5V5.833a2.5 2.5 0 00-2.5-2.5z"/>-->
-<!--        <path d="M3.333 12.5l3.334-3.333c.38-.366.81-.559 1.25-.559.438 0 .87.193 1.25.559l4.166 4.166"/>-->
-<!--        <path d="M11.667 11.667l.833-.834c.38-.365.811-.558 1.25-.558.439 0 .87.193 1.25.558l1.667 1.667"/>-->
-<!--      </svg>-->
-<!--    </button>-->
-<!--    <button class="p-0.5 rounded text-gray-500 hover:bg-gray-200 transition duration-100">-->
-<!--      <svg class="h-5 w-5" fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7">-->
-<!--        <path d="M5.833 6.667L2.5 10l3.333 3.333M14.167 6.667L17.5 10l-3.333 3.333M11.667 3.333L8.333 16.667"/>-->
-<!--      </svg>-->
-<!--    </button>-->
-<!--    <button class="p-0.5 rounded text-gray-500 hover:bg-gray-200 transition duration-100">-->
-<!--      <svg class="h-5 w-5" fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7">-->
-<!--        <path d="M16.667 10.833l-3.334 3.334m0-3.334l3.334 3.334-3.334-3.334zM16.667 4.167h-5.834L7.5 15.833l-2.5-5H3.333"/>-->
-<!--      </svg>-->
-<!--    </button>-->
-<!--  </div>-->
-<!--</div>-->
+  This is a div _with_ underscores
+  and a & <b class="bold">bold</b> element.
+
+  <style>
+    body { font: "Consolas" }
+  </style>
+</div>
+
+* Bullet lists are easy too
+- Another one
++ Another one
+
+This is a paragraph, which is text surrounded by
+whitespace. Paragraphs can be on one
+line (or many), and can drone on for hours.
+
+Now some inline markup like _italics_,  **bold**,
+and \`code()\`. Note that underscores
+in_words_are ignored.
+
+\`\`\`\`application/json
+{ value: ["or with a mime type"] }
+\`\`\`\`
+
+> Blockquotes are like quoted text in email replies
+>> And, they can be nested
+
+1. A numbered list
+2. Which is numbered
+3. With periods and a space
+
+And now some code:
+
+// Code is just text indented a bit
+which(is_easy) to_remember();
+
+And a block
+
+~~~
+// Markdown extra adds un-indented code blocks too
+
+if (this_is_more_code == true && !indented) {
+// tild wrapped code blocks, also not indented
+}
+~~~
+
+Text with
+two trailing spaces
+(on the right)
+can be used
+for things like poems
+
+### Horizontal rules
+
+* * * *
+****
+--------------------------
+
+![picture alt](/images/photo.jpeg "Title is optional")
+
+## Markdown plus tables ##
+
+| Header | Header | Right  |
+| ------ | ------ | -----: |
+|  Cell  |  Cell  |   $10  |
+|  Cell  |  Cell  |   $20  |
+
+* Outer pipes on tables are optional
+* Colon used for alignment (right versus left)
+
+## Markdown plus definition lists ##
+
+Bottled water
+: $ 1.25
+: $ 1.55 (Large)
+
+Milk
+Pop
+: $ 1.75
+
+* Multiple definitions and terms are possible
+* Definitions can include multiple paragraphs too
+
+*[ABBR]: Markdown plus abbreviations (produces an <abbr> tag)`
+      ].join('\n'),
+      // language: 'markdown',
+    });
+
+    require(['MonacoMarkdown'], function (MonacoMarkdown) {
+      let extension = new MonacoMarkdown.MonacoMarkdownExtension()
+      extension.activate(editor)
+    });
+
+
+  }, 100);
+</script>
+<script src="./dist/renderer.js" type="module"></script>
 
 </body>
 </html>

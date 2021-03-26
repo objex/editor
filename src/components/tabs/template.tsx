@@ -10,7 +10,6 @@ export function renderTabs({tabs$}: RenderOptions) {
   const wrapper = <div class="appbar__tabs"/>;
 
   tabs$.subscribe((tabs) => {
-    console.log(tabs);
     const tabEls = tabs.map((tab) => {
       return (
         <div class="appbar__tab">

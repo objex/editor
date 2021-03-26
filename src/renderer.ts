@@ -1,9 +1,7 @@
-import {mountTabs, renderAppBar, addTab} from "./components";
+import {renderApp} from "./components";
 
-const tabs$ = mountTabs();
-const app = renderAppBar({tabs$});
+const app = renderApp();
 
 document.getElementById('app').appendChild(app);
 
-tabs$.subscribe();
-addTab({name: "Home", closable: false});
+// editor.create(document.getElementById(''))

@@ -1,6 +1,5 @@
 const rollup = require('rollup');
 const {inputOptions, watchOptions} = require('./rollup.config');
-const path = require('path');
 const {terser} = require('rollup-plugin-terser');
 const {outputDir} = require('./_config');
 
@@ -15,16 +14,16 @@ async function jsDevelopment() {
 function jsProduction() {
   return Promise.all(
       inputOptions.map(async (input) => {
-        const outputFileName = input.outputFileName;
-        let inputOptions = {...input};
-        delete inputOptions.outputFileName;
-        const bundle = await rollup.rollup(inputOptions);
+        const bundle = await rollup.rollup(input);
 
         await bundle.write({
-          file: path.join(outputDir, outputFileName),
-          format: 'iife',
+          dir: outputDir,
+          format: 'esm',
           sourcemap: true,
           plugins: [terser({format: {comments: false}})],
+          globals: {
+            'monaco-editor': 'monaco-editor'
+          }
         });
         await bundle.close();
       })

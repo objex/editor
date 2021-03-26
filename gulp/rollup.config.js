@@ -1,6 +1,7 @@
 const {nodeResolve} = require('@rollup/plugin-node-resolve');
-const {terser} = require('rollup-plugin-terser');
 const typescript = require('rollup-plugin-typescript2');
+const postcss = require('rollup-plugin-postcss');
+const commonjs = require('@rollup/plugin-commonjs');
 const path = require('path');
 
 const {inputDir, outputDir} = require('./_config')
@@ -9,9 +10,11 @@ const {inputDir, outputDir} = require('./_config')
 const inputOptions = [
   {
     input: path.join(inputDir, 'renderer.ts'),
-    outputFileName: 'app.js',
+    external: ['monaco-editor'],
     plugins: [
+      postcss(),
       nodeResolve(),
+      commonjs(),
       typescript(),
     ],
   },
@@ -26,15 +29,16 @@ const inputOptions = [
 ]
 
 const watchOptions = inputOptions.map((input) => {
-  const outputFileName = input.outputFileName;
-  let inputOptions = {...input};
-  delete inputOptions.outputFileName;
   return {
-    ...inputOptions,
+    ...input,
     output: {
-      file: path.join(outputDir, outputFileName),
-      format: 'iife',
+      dir: outputDir,
+      format: 'esm',
+      globals: {
+        'monaco-editor': 'monaco-editor'
+      }
     },
+    preserveEntrySignatures: false,
     watch: {
       include: 'src/**/*',
     },
