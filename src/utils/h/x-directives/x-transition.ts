@@ -1,4 +1,5 @@
-import {Directive, getXAttrs} from "./_";
+import {getXAttrs} from "./_";
+import {Directive} from "./types";
 
 /* ----------------------------
  *  Types
@@ -114,13 +115,15 @@ function transitionClasses(
     during() {
       el.classList.add(...classesDuring);
     },
-    show() {},
+    show() {
+    },
     end() {
       // Don't remove classes that were in the original class attribute.
       el.classList.remove(...classesStart.filter((i: string) => !originalClasses.includes(i)));
       el.classList.add(...classesEnd);
     },
-    hide() {},
+    hide() {
+    },
     cleanup() {
       el.classList.remove(...classesDuring.filter((i: string) => !originalClasses.includes(i)));
       el.classList.remove(...classesEnd.filter((i: string) => !originalClasses.includes(i)));

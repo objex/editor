@@ -1,7 +1,7 @@
 import {JSX as JSXInternal} from "preact"
 import svgTags from "./svgTags";
 
-import {mountXShow, XAttributes} from "./x-directives";
+import {mountXOn, mountXShow, parseHtmlAttribute, XAttributes} from "./x-directives";
 
 type Child =
   | HTMLElement
@@ -73,7 +73,10 @@ export function h(
   /* Set attributes, if any */
   if (attributes) {
     for (const attr of Object.keys(attributes)) {
-      if (attr === 'x-show') {
+      if (attr.startsWith('x-on') || attr.startsWith('@')) {
+        let parsedAttr = parseHtmlAttribute(attributes[attr]);
+        mountXOn(el as HTMLElement, parsedAttr);
+      } else if (attr === 'x-show') {
         mountXShow(el, attributes[attr]);
         continue;
       }

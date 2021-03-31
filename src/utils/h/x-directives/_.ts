@@ -1,14 +1,9 @@
-export interface Directive {
-  type: string;
-  value?: string;
-  modifiers?: string[];
-  expression: string;
-}
-
 /**
  * parse attribute value
  */
-function parseHtmlAttribute({name, value}: Attr): Directive {
+import {Directive} from "./types";
+
+export function parseHtmlAttribute({name, value}: Attr): Directive {
 
   const normalizedType = name
     .replace('x-', '')
@@ -30,10 +25,23 @@ function parseHtmlAttribute({name, value}: Attr): Directive {
  * @param el
  * @param type filter attributes based on given type
  */
-export function getXAttrs(el: HTMLElement | SVGElement, type: string): Directive[] {
+export function getXAttrs(el: HTMLElement | SVGElement, type?: string): Directive[] {
   let directives = Array.from(el.attributes)
     .filter((attr) => attr.name.startsWith('x-'))
     .map(parseHtmlAttribute)
   if (type) return directives.filter(i => i.type === type)
   return directives;
+}
+
+export function debounce(func: (...args: any[]) => any, wait: number, ...args: any[]) {
+  let timeout: any;
+  return function () {
+    let context = this;
+    let later = function () {
+      timeout = null
+      func.apply(context, args)
+    }
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait);
+  }
 }
