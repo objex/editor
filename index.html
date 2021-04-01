@@ -91,33 +91,7 @@ md.convert("""${md.replace(/\\/g, '\\\\')}""")
     }
   </script>
 
-  <!-- <script>var require = { paths: { 'vs': './node_modules/monaco-editor/min/vs' } };</script>
-  <script src="./node_modules/monaco-editor/min/vs/loader.js"></script>
-  <script src="./node_modules/monaco-editor/min/vs/editor/editor.main.nls.js"></script>
-  <script src="./node_modules/monaco-editor/min/vs/editor/editor.main.js"></script>
-  <script src="./node_modules/monaco-markdown/umd/monaco-markdown.js"></script> -->
-  <!-- <script>
-    let model;
-
-    setTimeout(() => {
-      require(['MonacoMarkdown'], function (MonacoMarkdown) {
-        let extension = new MonacoMarkdown.MonacoMarkdownExtension();
-        extension.activate(editor);
-      });
-
-      model.onDidChangeContent(() => {
-        // console.log(m)
-        previewEl.innerHTML = renderMath(parseMd(model.getValue()));
-      })
-
-      setTimeout(() => {
-        previewEl.innerHTML = parseMd(model.getValue());
-      }, 10000);
-
-    }, 100);
-  </script> -->
   <script src="./dist/renderer.js" type="module"></script>
-
 </body>
 
 </html>
