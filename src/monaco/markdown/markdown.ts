@@ -55,7 +55,7 @@ export const language = <languages.IMonarchLanguage>{
 		root: [
 
 			// headers (with #)
-			[/^(\s{0,3})(#+)((?:[^\\#]|@escapes)+)((?:#+)?)/, ['white', 'keyword', 'keyword', 'keyword']],
+			[/^(\s{0,3})(#+)((?:[^\\#]|@escapes)+)((?:#+)?)/, ['white', 'markup.heading', 'markup.heading', 'markup.heading']],
 
 			// headers (with =)
 			[/^\s*(=+|\-+)\s*$/, 'keyword'],
@@ -84,7 +84,6 @@ export const language = <languages.IMonarchLanguage>{
 			//math
 			[/(^\${2})/, {token: 'comment.math', next: 'math', bracket: '@open'}],
 
-
 			// markup within lines
 			{ include: '@linecontent' },
 
@@ -98,7 +97,7 @@ export const language = <languages.IMonarchLanguage>{
 
 		// github style code blocks
 		codeblockgh: [
-			[/```\s*$/, { token: 'variable.source', next: '@pop', nextEmbedded: '@pop' }],
+			[/```\s*$/, { token: 'string', next: '@pop', nextEmbedded: '@pop' }],
 			[/[^`]+/, 'variable.source'],
 		],
 
