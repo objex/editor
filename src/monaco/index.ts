@@ -1,5 +1,6 @@
 import { loadMonaco } from "./_";
 import { getTheme } from './theme';
+import { registerMarkdown, MonacoMarkdownExtension } from './markdown';
 
 export async function mountMonacoEditor(editorEl: HTMLElement) {
     await loadMonaco();
@@ -7,6 +8,9 @@ export async function mountMonacoEditor(editorEl: HTMLElement) {
         return;
     }
 
+    /* ---------------
+     * Regsiter Theme
+     * --------------- */
     window.monaco.editor.defineTheme('github-dark', getTheme('dark'));
     window.monaco.editor.defineTheme('github-light', getTheme('light'));
 
@@ -16,6 +20,16 @@ export async function mountMonacoEditor(editorEl: HTMLElement) {
         window.monaco.editor.setTheme('github-light');
     }
 
+
+    /* ------------------
+     * Regsiter Langauge
+     * ------------------ */
+    registerMarkdown(window.monaco);
+
+
+    /* ------------------
+     * Create Editor Model
+     * ------------------ */
 
     let model = window.monaco.editor.createModel([
         `# Header 1 #
@@ -119,7 +133,11 @@ Pop
 * Definitions can include multiple paragraphs too
 
 *[ABBR]: Markdown plus abbreviations (produces an <abbr> tag)`
-    ].join('\n'), "markdown");
+    ].join('\n'), "pymarkdown");
+
+    /* --------------------
+     * Mount editor to DOM
+     * -------------------- */
 
     let editor = window.monaco.editor.create(editorEl, {
         // language: 'markdown-math',
@@ -132,8 +150,14 @@ Pop
         // theme: 'owl-light',
         smoothScrolling: true,
         minimap: {
-          enabled: false
+            enabled: false
         },
         model,
-      });
+    });
+
+
+    /* ----------------------------
+     * Activate Markdown Extension
+     * ---------------------------- */
+    new MonacoMarkdownExtension().activate(editor, window.monaco);
 }
