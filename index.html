@@ -1,37 +1,39 @@
 <!DOCTYPE html>
-
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Rabbito Editor</title>
 
   <link href="./dist/styles.css" rel="stylesheet">
+  <link rel="stylesheet" href="./node_modules/katex/dist/katex.min.css">
   <link rel="stylesheet" data-name="vs/editor/editor.main"
-        href="./node_modules/monaco-editor/min/vs/editor/editor.main.css">
+    href="./node_modules/monaco-editor/min/vs/editor/editor.main.css">
 </head>
-<body>
 
-<div id="app"></div>
+<body class="overflow-hidden">
 
-<script type="text/javascript">
-  window.languagePluginUrl = 'https://cdn.jsdelivr.net/pyodide/v0.16.1/full/';
-</script>
-<script src="https://cdn.jsdelivr.net/pyodide/v0.16.1/full/pyodide.js"></script>
+  <div id="app"></div>
 
-<script>
-  let parserLoaded = false;
-  // init Pyodide
-  languagePluginLoader.then(async () => {
-    await pyodide.runPythonAsync(`
+  <script type="text/javascript">
+    window.languagePluginUrl = 'https://cdn.jsdelivr.net/pyodide/v0.16.1/full/';
+  </script>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.16.1/full/pyodide.js"></script>
+
+  <script>
+    let parserLoaded = false;
+    // init Pyodide
+    languagePluginLoader.then(async () => {
+      await pyodide.runPythonAsync(`
       import micropip
       micropip.install('markdown')
       micropip.install('pymdown-extensions')
       micropip.install('pygments')
     `);
-    await pyodide.runPythonAsync(`
+      await pyodide.runPythonAsync(`
       from markdown import Markdown
 
       MD_EXTENSIONS = [
@@ -78,188 +80,44 @@
       }
     `);
 
-    parserLoaded = true;
-  });
+      parserLoaded = true;
+    });
 
-  function parseMd(md) {
-    return pyodide.runPython(`
+    function parseMd(md) {
+      return pyodide.runPython(`
 md = Markdown(extensions=MD_EXTENSIONS, extension_configs=MD_EXTENSIONS_CONFIG)
-md.convert("""${md}""")
+md.convert("""${md.replace(/\\/g, '\\\\')}""")
     `);
-  }
-</script>
+    }
+  </script>
 
-<script>var require = {paths: {'vs': './node_modules/monaco-editor/min/vs'}};</script>
-<script src="./node_modules/monaco-editor/min/vs/loader.js"></script>
-<script src="./node_modules/monaco-editor/min/vs/editor/editor.main.nls.js"></script>
-<script src="./node_modules/monaco-editor/min/vs/editor/editor.main.js"></script>
-<script src="./node_modules/monaco-markdown/umd/monaco-markdown.js"></script>
-<script>
-  setTimeout(() => {
-    monaco.editor.defineTheme('owl-light', {
-      base: 'vs',
-      inherit: true,
-      rules: [
-        {background: '#FBFBFB', foreground: '#24292E'},
-        {token: 'markup.heading', foreground: '#005CC5', fontStyle: "bold"},
-        {token: 'entity.name', foreground: '#005CC5', fontStyle: "bold"},
-        {token: 'keyword.js', foreground: '#D73A49'},
-        {token: 'operators', foreground: '#D73A49'},
-        {token: 'comment', foreground: '#6A737D'},
-        {token: 'tag', foreground: '#22863A'},
-        {token: 'number', foreground: '#005CC5'},
-        {token: 'string', foreground: '#032F62'},
-        {token: 'string.html', foreground: '#032F62'},
-        {token: 'string.yaml', foreground: '#032F62'},
-        {token: 'namespace.yaml', foreground: '#6F42C1'},
-        {token: 'type.yaml', foreground: '#22863A'},
-        {token: 'attribute.name', foreground: '#6F42C1'},
-        // {token: 'identifier.js', foreground: '#D73A49'},
-      ],
-      colors: {
-        'editor.foreground': '#2E3440',
-      }
-    });
-
-    monaco.editor.setTheme('owl-light');
-    let model = monaco.editor.createModel([
-        `# Header 1 #
-## Header 2 ##
-### Header 3 ###             (Hashes on right are optional)
-## Markdown plus h2 with a custom ID ##   {#id-goes-here}
-[Link back to H2](#id-goes-here)
-
-\`\`\`js
-var x = "string";
-function f() {
-  return x;
-}
-\`\`\`
-
-<!-- html madness -->
-<div class="custom-class" markdown="1">
-  <div>
-    nested div
-  </div>
-
-  This is a div _with_ underscores
-  and a & <b class="bold">bold</b> element.
-
-  <style>
-    body { font: "Consolas" }
-  </style>
-</div>
-
-* Bullet lists are easy too
-- Another one
-+ Another one
-
-This is a paragraph, which is text surrounded by
-whitespace. Paragraphs can be on one
-line (or many), and can drone on for hours.
-
-Now some inline markup like _italics_,  **bold**,
-and \`code()\`. Note that underscores
-in_words_are ignored.
-
-\`\`\`\`application/json
-{ value: ["or with a mime type"] }
-\`\`\`\`
-
-> Blockquotes are like quoted text in email replies
->> And, they can be nested
-
-1. A numbered list
-2. Which is numbered
-3. With periods and a space
-
-And now some code:
-
-// Code is just text indented a bit
-which(is_easy) to_remember();
-
-And a block
-
-~~~
-// Markdown extra adds un-indented code blocks too
-
-if (this_is_more_code == true && !indented) {
-// tild wrapped code blocks, also not indented
-}
-~~~
-
-Text with
-two trailing spaces
-(on the right)
-can be used
-for things like poems
-
-### Horizontal rules
-
-* * * *
-****
---------------------------
-
-![picture alt](/images/photo.jpeg "Title is optional")
-
-## Markdown plus tables ##
-
-| Header | Header | Right  |
-| ------ | ------ | -----: |
-|  Cell  |  Cell  |   $10  |
-|  Cell  |  Cell  |   $20  |
-
-* Outer pipes on tables are optional
-* Colon used for alignment (right versus left)
-
-## Markdown plus definition lists ##
-
-Bottled water
-: $ 1.25
-: $ 1.55 (Large)
-
-Milk
-Pop
-: $ 1.75
-
-* Multiple definitions and terms are possible
-* Definitions can include multiple paragraphs too
-
-*[ABBR]: Markdown plus abbreviations (produces an <abbr> tag)`
-      ].join('\n'), "markdown");
-
-    let editor = monaco.editor.create(window.editorEl, {
-      language: 'markdown-math',
-      wordWrap: 'on',
-      automaticLayout: true,
-      fontFamily: "'Fira Code'",
-      fontSize: 13,
-      fontLigatures: true,
-      // lineHeight: '20%',
-      theme: 'owl-light',
-      smoothScrolling: true,
-      minimap: {
-        enabled: false
-      },
-      model,
-    });
-
-    require(['MonacoMarkdown'], function (MonacoMarkdown) {
-      let extension = new MonacoMarkdown.MonacoMarkdownExtension();
-      extension.activate(editor);
-    });
-
-    model.onDidChangeContent(() => {
-      previewEl.innerHTML = parseMd(model.getValue());
-    })
+  <!-- <script>var require = { paths: { 'vs': './node_modules/monaco-editor/min/vs' } };</script>
+  <script src="./node_modules/monaco-editor/min/vs/loader.js"></script>
+  <script src="./node_modules/monaco-editor/min/vs/editor/editor.main.nls.js"></script>
+  <script src="./node_modules/monaco-editor/min/vs/editor/editor.main.js"></script>
+  <script src="./node_modules/monaco-markdown/umd/monaco-markdown.js"></script> -->
+  <!-- <script>
+    let model;
 
     setTimeout(() => {
-      previewEl.innerHTML = parseMd(model.getValue());
-    }, 5000);
+      require(['MonacoMarkdown'], function (MonacoMarkdown) {
+        let extension = new MonacoMarkdown.MonacoMarkdownExtension();
+        extension.activate(editor);
+      });
 
-  }, 100);
-</script>
-<script src="./dist/renderer.js" type="module"></script>
+      model.onDidChangeContent(() => {
+        // console.log(m)
+        previewEl.innerHTML = renderMath(parseMd(model.getValue()));
+      })
+
+      setTimeout(() => {
+        previewEl.innerHTML = parseMd(model.getValue());
+      }, 10000);
+
+    }, 100);
+  </script> -->
+  <script src="./dist/renderer.js" type="module"></script>
 
 </body>
+
 </html>
