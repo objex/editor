@@ -84,8 +84,8 @@ in_words_are ignored.
 
 And now some code:
 
-// Code is just text indented a bit
-which(is_easy) to_remember();
+    // Code is just text indented a bit
+    which(is_easy) to_remember();
 
 And a block
 
@@ -155,6 +155,9 @@ Pop
         model,
     });
 
+    (window as any).editor = editor;
+    (window as any).model = model;
+    // model.onDidChangeContent
 
     /* ----------------------------
      * Activate Markdown Extension

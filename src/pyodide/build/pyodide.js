@@ -562,6 +562,24 @@ export async function loadPyodide(config = {}) {
   // clang-format on
 
   /**
+   * Access a Python object in the global namespace from Javascript.
+   *
+   * Note: this function is deprecated and will be removed in version 0.18.0.
+   * Use pyodide.globals.get('key') instead.
+   *
+   * @param {string} name Python variable name
+   * @returns If the Python object is an immutable type (string, number,
+   * boolean), it is converted to Javascript and returned.  For other types, a
+   * ``PyProxy`` object is returned.
+   */
+   Module.pyimport = name => {
+    console.warn(
+        "Access to the Python global namespace via pyodide.pyimport is deprecated and " +
+        "will be removed in version 0.18.0. Use pyodide.globals.get('key') instead.");
+    return Module.globals.get(name);
+  };
+
+  /**
    * Runs Python code, possibly asynchronously loading any known packages that
    * the code imports. For example, given the following code
    *
@@ -728,7 +746,7 @@ export async function loadPyodide(config = {}) {
   // _createPyodideModule is specified in the Makefile by the linker flag:
   // `-s EXPORT_NAME="'_createPyodideModule'"`
   await _createPyodideModule(Module);
-  delete globalThis._createPyodideModule;
+  // delete globalThis._createPyodideModule;
 
   // There is some work to be done between the module being "ready" and postRun
   // being called.
