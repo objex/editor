@@ -1,21 +1,16 @@
-# Rabbito Editor
+# Objex Editor
+## An Open Source Markdown Editor
+Description: An Open Source markdown editor.
 
-## Running Locally
+## Technology stack: Python
+## Status: Alpha-0.0.0
 
-1. Install dependencies
-    ```sh
-    npm i
-    ```
-2. Compile files in watch mode
-    ```sh
-    npm run watch
-    ```
-3. Open a new ternimal and run the following command to open the app in electron
-    ```sh
-    npm run start
-    ```
 
-##  Compiling Pyodide Package
+## Dependencies
+Project required npm to be installed as a package manager. Pyodide (?? update why we need it??)
+
+## Installation
+###  Compiling Pyodide Package
 
 Following is the way I used to compile pyodide package. But for alternative solutions checkout [Pydoide Docs](https://pyodide.org/en/latest/development/new-packages.html).
 
@@ -47,4 +42,48 @@ Following is the way I used to compile pyodide package. But for alternative solu
 7. Copy file from `build` folder to `/src/pyodide/build` but keep in mind not to remove `pyodide.d.ts` and `pyodide.js` also contains some changes.
 8. Thanks for you patience.
 
-Should we automate this process? I guess the outcome doesn't worth the effort needed.
+
+Configuration
+npm pacakge manager is reqired. (?? what else ??)
+
+Usage
+1. Install dependencies
+    ```sh
+    npm i
+    ```
+2. Compile files in watch mode
+    ```sh
+    npm run watch
+    ```
+3. Open a new ternimal and run the following command to open the app in electron
+    ```sh
+    npm run start
+    ```
+
+## How to test the software
+?? test ??
+
+## Known issues
+Document any known significant shortcomings with the software.
+
+## Getting help
+How we can be contacted??
+
+Example
+
+If you have questions, concerns, bug reports, etc, please file an issue in this repository's Issue Tracker.
+
+Getting involved
+This section should detail why people should get involved and describe key areas you are currently focusing on; e.g., trying to get feedback on features, fixing certain bugs, building important pieces, etc.
+
+General instructions on how to contribute should be stated with a link to CONTRIBUTING.
+
+Open source licensing info
+TERMS
+LICENSE
+
+## Credits and references
+Objex and Rabbito.io team
+
+## Related projects
+
