@@ -21,9 +21,9 @@ function jsProduction() {
           format: 'esm',
           sourcemap: true,
           plugins: [terser({format: {comments: false}})],
-          globals: {
-            'monaco-editor': 'monaco-editor'
-          }
+          // globals: {
+          //   './build/pyodide': './pyodide/pyodide.js'
+          // },
         });
         await bundle.close();
       })

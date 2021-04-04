@@ -10,7 +10,7 @@ const {inputDir, outputDir} = require('./_config')
 const inputOptions = [
   {
     input: path.join(inputDir, 'renderer.ts'),
-    external: ['monaco-editor'],
+    external: ['./build/pyodide.js'],
     plugins: [
       postcss(),
       nodeResolve(),
@@ -35,10 +35,9 @@ const watchOptions = inputOptions.map((input) => {
       dir: outputDir,
       format: 'esm',
       globals: {
-        'monaco-editor': 'monaco-editor'
-      }
+        './build/pyodide': './pyodide/pyodide.js'
+      },
     },
-    preserveEntrySignatures: false,
     watch: {
       include: 'src/**/*',
     },
