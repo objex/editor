@@ -1,6 +1,6 @@
 export function loadScript(url: string) {
     return new Promise<void>((resolve, reject) => {
-        var script = document.createElement('script');
+        let script = document.createElement('script');
         script.onload = () => {
             resolve();
         };

@@ -1,34 +1,38 @@
-// import { app, BrowserWindow } from "electron";
-// import * as path from "path";
 const {app, BrowserWindow} = require('electron');
 const path = require('path');
+// const {template} = require('./menu');
+
+let i = 1;
 
 function createWindow() {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
-    titleBarStyle: 'hidden',
-    trafficLightPosition: {
-      x: 12,
-      y: 28,
-    },
+    // titleBarStyle: 'hidden',
+    // trafficLightPosition: {
+    //   x: 12,
+    //   y: 28,
+    // },
+    title: 'Objex Editor',
+    tabbingIdentifier: `tab-${i++}`,
     height: 600,
     webPreferences: {
+      contextIsolation: false,
+      webSecurity: false,
       nodeIntegration: true,
+      nodeIntegrationInWorker: true,
       enableRemoteModule: true,
       preload: path.join(__dirname, "preload.js"),
     },
     width: 800,
   });
 
-  // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, "./index.html"));
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.on("ready", () => {
   createWindow();
+
+  // const menu = Menu.buildFromTemplate(template)
+  // Menu.setApplicationMenu(menu);
 
   app.on("activate", function () {
     // On macOS it's common to re-create a window in the app when the
@@ -37,9 +41,6 @@ app.on("ready", () => {
   });
 });
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();

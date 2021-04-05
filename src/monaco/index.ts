@@ -158,6 +158,7 @@ Pop
     (window as any).editor = editor;
     (window as any).model = model;
     // model.onDidChangeContent
+    // model.uri
 
     /* ----------------------------
      * Activate Markdown Extension

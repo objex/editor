@@ -1,8 +1,10 @@
 import { renderApp } from "./components";
 import { loadMarkdownParser, parseMarkdown } from './pyodide';
-import { renderMathInText } from './utils/katex';
+import { renderMathInText } from './utils';
 import { animationFrameScheduler, from, Subject } from 'rxjs'
 import { debounceTime, observeOn, switchMap } from "rxjs/operators";
+
+import './menu';
 
 const app = renderApp();
 
