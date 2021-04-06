@@ -79,8 +79,9 @@ const template = [
             return;
           }
 
-          // ipcRenderer.send('new-window');
-          window.model.setValue('');
+          const oldModel = window.model;
+          window.model = window.monaco.editor.createModel('', 'pymarkdown');
+          oldModel.dispose();
         }
       },
       {
