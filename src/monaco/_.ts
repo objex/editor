@@ -19,6 +19,5 @@ export function loadMonaco() {
         loadScript('./node_modules/monaco-editor/min/vs/loader.js'),
         loadScript('./node_modules/monaco-editor/min/vs/editor/editor.main.nls.js'),
         loadScript('./node_modules/monaco-editor/min/vs/editor/editor.main.js'),
-        // loadScript('./node_modules/monaco-markdown/umd/monaco-markdown.js'),
     ]);
 }

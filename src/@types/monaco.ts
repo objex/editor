@@ -4,7 +4,9 @@ export {};
 
 declare global {
     interface Window {
-        monaco?: typeof monaco
-        __setTheme?: () => void
+        monaco?: typeof monaco;
+        editor?: monaco.editor.IStandaloneCodeEditor;
+        model?: monaco.editor.ITextModel;
+        __setTheme?: () => void;
     }    
 }

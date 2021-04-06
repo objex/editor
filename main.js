@@ -1,11 +1,9 @@
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('path');
-// const {template} = require('./menu');
 
 let i = 1;
-
-function createWindow() {
-  const mainWindow = new BrowserWindow({
+function createWindow(setInitialText=false) {
+  const window = new BrowserWindow({
     // titleBarStyle: 'hidden',
     // trafficLightPosition: {
     //   x: 12,
@@ -25,11 +23,19 @@ function createWindow() {
     width: 800,
   });
 
-  mainWindow.loadFile(path.join(__dirname, "./index.html"));
+  window.loadFile(path.join(__dirname, "./index.html"), {
+    query: {
+      setInitialText: setInitialText,
+    }
+  })
 }
 
-app.on("ready", () => {
+ipcMain.on('new-window', () => {
   createWindow();
+})
+
+app.on("ready", () => {
+  createWindow(true);
 
   // const menu = Menu.buildFromTemplate(template)
   // Menu.setApplicationMenu(menu);
