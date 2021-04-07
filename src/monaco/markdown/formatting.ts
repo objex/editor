@@ -1,19 +1,27 @@
-import { fixMarker } from './listEditing';
+import {fixMarker} from './listEditing';
 import {TextDocument, TextEditor} from "./vscode-monaco";
 import {Position, Selection, Range, WorkspaceEdit} from "./extHostTypes";
 import {addKeybinding} from './util';
 
 export function activateFormatting(editor: TextEditor, monaco: typeof window.monaco) {
-    addKeybinding(editor, "toggleBold", toggleBold, [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_B], "Toggle bold");
-    addKeybinding(editor, "toggleItalic", toggleItalic, [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_I], "Toggle italic");
-    addKeybinding(editor, "toggleCodeSpan", toggleCodeSpan, [monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_BACKTICK], "Toggle code span");
-    addKeybinding(editor, "toggleStrikethrough", toggleStrikethrough, [monaco.KeyMod.Alt | monaco.KeyCode.KEY_S], "Toggle strikethrough");
-    addKeybinding(editor, "toggleMath", toggleMath, [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_M], "Toggle math");
-    addKeybinding(editor, "toggleMathReverse", toggleMathReverse, [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KEY_M], "Toggle math reverse");
-    addKeybinding(editor, "toggleHeadingUp", toggleHeadingUp, [monaco.KeyMod.WinCtrl | monaco.KeyMod.Shift | monaco.KeyCode.US_CLOSE_SQUARE_BRACKET], "Heading up");
-    addKeybinding(editor, "toggleHeadingDown", toggleHeadingDown, [monaco.KeyMod.WinCtrl | monaco.KeyMod.Shift | monaco.KeyCode.US_OPEN_SQUARE_BRACKET], "Heading down");
-    addKeybinding(editor, "toggleList", toggleList, [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_L], "Toggle list");
-    // addKeybinding(editor, paste, [KeyMod.CtrlCmd | KeyCode.KEY_B], "Toggle bold");
+  addKeybinding(editor, "toggleBold", toggleBold, [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_B], "Toggle bold");
+  addKeybinding(editor, "toggleItalic", toggleItalic, [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_I], "Toggle italic");
+  addKeybinding(editor, "toggleCodeSpan", toggleCodeSpan, [monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_BACKTICK], "Toggle code span");
+  addKeybinding(editor, "toggleStrikethrough", toggleStrikethrough, [monaco.KeyMod.Alt | monaco.KeyCode.KEY_S], "Toggle strikethrough");
+  addKeybinding(editor, "toggleMath", toggleMath, [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_M], "Toggle math");
+  addKeybinding(editor, "toggleMathReverse", toggleMathReverse, [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KEY_M], "Toggle math reverse");
+  addKeybinding(editor, "toggleHeadingUp", toggleHeadingUp, [monaco.KeyMod.WinCtrl | monaco.KeyMod.Shift | monaco.KeyCode.US_CLOSE_SQUARE_BRACKET], "Heading up");
+  addKeybinding(editor, "toggleHeadingDown", toggleHeadingDown, [monaco.KeyMod.WinCtrl | monaco.KeyMod.Shift | monaco.KeyCode.US_OPEN_SQUARE_BRACKET], "Heading down");
+
+  addKeybinding(editor, "toggleHeading1", toggleAtLineStart('# '), [], "Toggle Heading 1");
+  addKeybinding(editor, "toggleHeading2", toggleAtLineStart('## '), [], "Toggle Heading 2");
+  addKeybinding(editor, "toggleHeading3", toggleAtLineStart('### '), [], "Toggle Heading 3");
+  addKeybinding(editor, "toggleHeading4", toggleAtLineStart('#### '), [], "Toggle Heading 3");
+
+  addKeybinding(editor, "toggleList", toggleList, [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_L], "Toggle list");
+  addKeybinding(editor, "toggleUnorderedList", toggleAtLineStart('* ', ['+ ', '- ']), [], "Toggle unordered list");
+  addKeybinding(editor, "toggleBlockQuote", toggleAtLineStart('> '), [], "Toggle block quote");
+  // addKeybinding(editor, paste, [KeyMod.CtrlCmd | KeyCode.KEY_B], "Toggle bold");
 }
 
 /**
@@ -24,85 +32,85 @@ const singleLinkRegex: RegExp = createLinkRegex();
 // Return Promise because need to chain operations in unit tests
 
 function toggleBold(editor: TextEditor) {
-    return styleByWrapping(editor, '**');
+  return styleByWrapping(editor, '**');
 }
 
 function toggleItalic(editor: TextEditor) {
-    // let indicator = workspace.getConfiguration('markdown.extension.italic').get<string>('indicator');
-    return styleByWrapping(editor, '*');
+  // let indicator = workspace.getConfiguration('markdown.extension.italic').get<string>('indicator');
+  return styleByWrapping(editor, '*');
 }
 
 function toggleCodeSpan(editor: TextEditor) {
-    return styleByWrapping(editor, '`');
+  return styleByWrapping(editor, '`');
 }
 
 function toggleStrikethrough(editor: TextEditor) {
-    return styleByWrapping(editor, '~~');
+  return styleByWrapping(editor, '~~');
 }
 
 const maxHeading = '######';
 
 function toggleHeadingUp(editor: TextEditor) {
-    let lineIndex = editor.selection.active.line;
-    let lineText = editor.document.lineAt(lineIndex).text;
+  let lineIndex = editor.selection.active.line;
+  let lineText = editor.document.lineAt(lineIndex).text;
 
-    return editor.edit((editBuilder) => {
-        if (!lineText.startsWith('#')) { // Not a heading
-            editBuilder.insert(new Position(lineIndex, 0), '# ');
-        } else if (lineText.startsWith(maxHeading)) { // Reset heading at 6 level
-            let deleteIndex = lineText.startsWith(maxHeading + ' ') ? maxHeading.length + 1 : maxHeading.length;
-            editBuilder.delete(new Range(new Position(lineIndex, 0), new Position(lineIndex, deleteIndex)));
-        } else {
-            editBuilder.insert(new Position(lineIndex, 0), '#');
-        }
-    });
+  return editor.edit((editBuilder) => {
+    if (!lineText.startsWith('#')) { // Not a heading
+      editBuilder.insert(new Position(lineIndex, 0), '# ');
+    } else if (lineText.startsWith(maxHeading)) { // Reset heading at 6 level
+      let deleteIndex = lineText.startsWith(maxHeading + ' ') ? maxHeading.length + 1 : maxHeading.length;
+      editBuilder.delete(new Range(new Position(lineIndex, 0), new Position(lineIndex, deleteIndex)));
+    } else {
+      editBuilder.insert(new Position(lineIndex, 0), '#');
+    }
+  });
 }
 
 function toggleHeadingDown(editor: TextEditor) {
-    let lineIndex = editor.selection.active.line;
-    let lineText = editor.document.lineAt(lineIndex).text;
+  let lineIndex = editor.selection.active.line;
+  let lineText = editor.document.lineAt(lineIndex).text;
 
-    editor.edit((editBuilder) => {
-        if (lineText.startsWith('# ')) { // Heading level 1
-            editBuilder.delete(new Range(new Position(lineIndex, 0), new Position(lineIndex, 2)));
-        } else if (lineText.startsWith('#')) { // Heading (but not level 1)
-            editBuilder.delete(new Range(new Position(lineIndex, 0), new Position(lineIndex, 1)));
-        } else { // No heading
-            editBuilder.insert(new Position(lineIndex, 0), maxHeading + ' ');
-        }
-    });
+  editor.edit((editBuilder) => {
+    if (lineText.startsWith('# ')) { // Heading level 1
+      editBuilder.delete(new Range(new Position(lineIndex, 0), new Position(lineIndex, 2)));
+    } else if (lineText.startsWith('#')) { // Heading (but not level 1)
+      editBuilder.delete(new Range(new Position(lineIndex, 0), new Position(lineIndex, 1)));
+    } else { // No heading
+      editBuilder.insert(new Position(lineIndex, 0), maxHeading + ' ');
+    }
+  });
 }
 
 enum MathBlockState {
-    // State 1: not in any others states
-    NONE,
-    // State 2: $|$
-    INLINE,
-    // State 3: $$ | $$
-    SINGLE_DISPLAYED,
-    // State 4:
-    // $$
-    // |
-    // $$
-    MULTI_DISPLAYED
+  // State 1: not in any others states
+  NONE,
+  // State 2: $|$
+  INLINE,
+  // State 3: $$ | $$
+  SINGLE_DISPLAYED,
+  // State 4:
+  // $$
+  // |
+  // $$
+  MULTI_DISPLAYED
 }
 
 function getMathState(editor: TextEditor, cursor: Position): MathBlockState {
-    if (getContext(editor, cursor, '$') === '$|$') {
-        return MathBlockState.INLINE;
-    } else if (getContext(editor, cursor, '$$ ', ' $$') === '$$ | $$') {
-        return MathBlockState.SINGLE_DISPLAYED;
-    } else if (
-        editor.document.lineAt(cursor.line).text === ''
-        && cursor.line > 0
-        && editor.document.lineAt(cursor.line - 1).text === '$$'
-        && cursor.line < editor.document.lineCount - 1
-        && editor.document.lineAt(cursor.line + 1).text === '$$'
-    ) {
-        return MathBlockState.MULTI_DISPLAYED
-    } else {
-        return MathBlockState.NONE;
-    }
+  if (getContext(editor, cursor, '$') === '$|$') {
+    return MathBlockState.INLINE;
+  } else if (getContext(editor, cursor, '$$ ', ' $$') === '$$ | $$') {
+    return MathBlockState.SINGLE_DISPLAYED;
+  } else if (
+    editor.document.lineAt(cursor.line).text === ''
+    && cursor.line > 0
+    && editor.document.lineAt(cursor.line - 1).text === '$$'
+    && cursor.line < editor.document.lineCount - 1
+    && editor.document.lineAt(cursor.line + 1).text === '$$'
+  ) {
+    return MathBlockState.MULTI_DISPLAYED
+  } else {
+    return MathBlockState.NONE;
+  }
 }
 
 /**
@@ -113,142 +121,165 @@ function getMathState(editor: TextEditor, cursor: Position): MathBlockState {
  * @param newMathBlockState
  */
 function setMathState(editor: TextEditor, cursor: Position, oldMathBlockState: MathBlockState, newMathBlockState: MathBlockState) {
-    // Step 1: Delete old math block.
+  // Step 1: Delete old math block.
+  editor.edit(editBuilder => {
+    let rangeToBeDeleted: Range
+    switch (oldMathBlockState) {
+      case MathBlockState.NONE:
+        rangeToBeDeleted = new Range(cursor, cursor);
+        break;
+      case MathBlockState.INLINE:
+        rangeToBeDeleted = new Range(new Position(cursor.line, cursor.character - 1), new Position(cursor.line, cursor.character + 1));
+        break;
+      case MathBlockState.SINGLE_DISPLAYED:
+        rangeToBeDeleted = new Range(new Position(cursor.line, cursor.character - 3), new Position(cursor.line, cursor.character + 3));
+        break;
+      case MathBlockState.MULTI_DISPLAYED:
+        rangeToBeDeleted = new Range(new Position(cursor.line - 1, 0), new Position(cursor.line + 1, 2));
+        break;
+    }
+    editBuilder.delete(rangeToBeDeleted)
+  }).then(() => {
+    // Step 2: Insert new math block.
     editor.edit(editBuilder => {
-        let rangeToBeDeleted: Range
-        switch (oldMathBlockState) {
-            case MathBlockState.NONE:
-                rangeToBeDeleted = new Range(cursor, cursor);
-                break;
-            case MathBlockState.INLINE:
-                rangeToBeDeleted = new Range(new Position(cursor.line, cursor.character - 1), new Position(cursor.line, cursor.character + 1));
-                break;
-            case MathBlockState.SINGLE_DISPLAYED:
-                rangeToBeDeleted = new Range(new Position(cursor.line, cursor.character - 3), new Position(cursor.line, cursor.character + 3));
-                break;
-            case MathBlockState.MULTI_DISPLAYED:
-                rangeToBeDeleted = new Range(new Position(cursor.line - 1, 0), new Position(cursor.line + 1, 2));
-                break;
-        }
-        editBuilder.delete(rangeToBeDeleted)
+      let newCursor = editor.selection.active;
+      let stringToBeInserted: string
+      switch (newMathBlockState) {
+        case MathBlockState.NONE:
+          stringToBeInserted = ''
+          break;
+        case MathBlockState.INLINE:
+          stringToBeInserted = '$$'
+          break;
+        case MathBlockState.SINGLE_DISPLAYED:
+          stringToBeInserted = '$$  $$'
+          break;
+        case MathBlockState.MULTI_DISPLAYED:
+          stringToBeInserted = '$$\n\n$$'
+          break;
+      }
+      editBuilder.insert(newCursor, stringToBeInserted);
     }).then(() => {
-        // Step 2: Insert new math block.
-        editor.edit(editBuilder => {
-            let newCursor = editor.selection.active;
-            let stringToBeInserted: string
-            switch (newMathBlockState) {
-                case MathBlockState.NONE:
-                    stringToBeInserted = ''
-                    break;
-                case MathBlockState.INLINE:
-                    stringToBeInserted = '$$'
-                    break;
-                case MathBlockState.SINGLE_DISPLAYED:
-                    stringToBeInserted = '$$  $$'
-                    break;
-                case MathBlockState.MULTI_DISPLAYED:
-                    stringToBeInserted = '$$\n\n$$'
-                    break;
-            }
-            editBuilder.insert(newCursor, stringToBeInserted);
-        }).then(() => {
-            // Step 3: Move cursor to the middle.
-            let newCursor = editor.selection.active;
-            let newPosition: Position;
-            switch (newMathBlockState) {
-                case MathBlockState.NONE:
-                    newPosition = newCursor
-                    break;
-                case MathBlockState.INLINE:
-                    newPosition = newCursor.with(newCursor.line, newCursor.character - 1)
-                    break;
-                case MathBlockState.SINGLE_DISPLAYED:
-                    newPosition = newCursor.with(newCursor.line, newCursor.character - 3)
-                    break;
-                case MathBlockState.MULTI_DISPLAYED:
-                    newPosition = newCursor.with(newCursor.line - 1, 0)
-                    break;
-            }
-            editor.selection = new Selection(newPosition, newPosition);
-        })
-    });
+      // Step 3: Move cursor to the middle.
+      let newCursor = editor.selection.active;
+      let newPosition: Position;
+      switch (newMathBlockState) {
+        case MathBlockState.NONE:
+          newPosition = newCursor
+          break;
+        case MathBlockState.INLINE:
+          newPosition = newCursor.with(newCursor.line, newCursor.character - 1)
+          break;
+        case MathBlockState.SINGLE_DISPLAYED:
+          newPosition = newCursor.with(newCursor.line, newCursor.character - 3)
+          break;
+        case MathBlockState.MULTI_DISPLAYED:
+          newPosition = newCursor.with(newCursor.line - 1, 0)
+          break;
+      }
+      editor.selection = new Selection(newPosition, newPosition);
+    })
+  });
 }
 
 const transTable = [
-    MathBlockState.NONE,
-    MathBlockState.INLINE,
-    MathBlockState.MULTI_DISPLAYED,
-    MathBlockState.SINGLE_DISPLAYED
+  MathBlockState.NONE,
+  MathBlockState.INLINE,
+  MathBlockState.MULTI_DISPLAYED,
+  MathBlockState.SINGLE_DISPLAYED
 ];
 
 const reverseTransTable = new Array(...transTable).reverse();
 
 function toggleMath(editor: TextEditor) {
-    _toggleMath(editor, transTable)
+  _toggleMath(editor, transTable)
 }
 
 function toggleMathReverse(editor: TextEditor) {
-    _toggleMath(editor, reverseTransTable)
+  _toggleMath(editor, reverseTransTable)
 }
 
 function _toggleMath(editor: TextEditor, transTable: MathBlockState[]) {
-    if (!editor.selection.isEmpty) return;
-    let cursor = editor.selection.active;
+  if (!editor.selection.isEmpty) return;
+  let cursor = editor.selection.active;
 
-    let oldMathBlockState = getMathState(editor, cursor)
-    let currentStateIndex = transTable.indexOf(oldMathBlockState);
-    setMathState(editor, cursor, oldMathBlockState, transTable[(currentStateIndex + 1) % transTable.length])
+  let oldMathBlockState = getMathState(editor, cursor)
+  let currentStateIndex = transTable.indexOf(oldMathBlockState);
+  setMathState(editor, cursor, oldMathBlockState, transTable[(currentStateIndex + 1) % transTable.length])
 }
 
-function toggleList(editor: TextEditor) {
+function toggleAtLineStart(pattern: string, aliases: string[] = []) {
+  return (editor: TextEditor) => {
     const doc = editor.document;
     let batchEdit = new WorkspaceEdit();
 
-    editor.selections.forEach(selection => {
-        if (selection.isEmpty) {
-            toggleListSingleLine(doc, selection.active.line, batchEdit);
-        } else {
-            for (let i = selection.start.line; i <= selection.end.line; i++) {
-                toggleListSingleLine(doc, i, batchEdit);
-            }
+    function handler(doc: TextDocument, line: number, wsEdit: WorkspaceEdit) {
+      const lineText = doc.lineAt(line).text;
+      const indentation = lineText.trim().length === 0 ? lineText.length : lineText.indexOf(lineText.trim());
+      const lineTextContent = lineText.substr(indentation);
+
+      for (let p of [pattern, ...aliases]) {
+        if (typeof p === "string" && lineTextContent.startsWith(p)) {
+          wsEdit.delete(doc.uri, new Range(line, indentation, line, indentation + p.length));
+          return;
         }
+      }
+
+      wsEdit.insert(doc.uri, new Position(line, indentation), pattern);
+    }
+
+    editor.selections.forEach(selection => {
+      if (selection.isEmpty) {
+        handler(doc, selection.active.line, batchEdit);
+      } else {
+        for (let i = selection.start.line; i <= selection.end.line; i++) {
+          handler(doc, i, batchEdit);
+        }
+      }
     });
 
     return editor.applyEdit(batchEdit, [])
-        .then(() => fixMarker(editor));
+      .then(() => fixMarker(editor));
+  }
+}
+
+function toggleList(editor: TextEditor) {
+  const doc = editor.document;
+  let batchEdit = new WorkspaceEdit();
+
+  editor.selections.forEach(selection => {
+    if (selection.isEmpty) {
+      toggleListSingleLine(doc, selection.active.line, batchEdit);
+    } else {
+      for (let i = selection.start.line; i <= selection.end.line; i++) {
+        toggleListSingleLine(doc, i, batchEdit);
+      }
+    }
+  });
+
+  return editor.applyEdit(batchEdit, [])
+    .then(() => fixMarker(editor));
 }
 
 function toggleListSingleLine(doc: TextDocument, line: number, wsEdit: WorkspaceEdit) {
-    const lineText = doc.lineAt(line).text;
-    const indentation = lineText.trim().length === 0 ? lineText.length : lineText.indexOf(lineText.trim());
-    const lineTextContent = lineText.substr(indentation);
+  const lineText = doc.lineAt(line).text;
+  const indentation = lineText.trim().length === 0 ? lineText.length : lineText.indexOf(lineText.trim());
+  const lineTextContent = lineText.substr(indentation);
 
-    if (lineTextContent.startsWith("- ")) {
-        wsEdit.replace(doc.uri, new Range(line, indentation, line, indentation + 2), "* ");
-    } else if (lineTextContent.startsWith("* ")) {
-        wsEdit.replace(doc.uri, new Range(line, indentation, line, indentation + 2), "+ ");
-    } else if (lineTextContent.startsWith("+ ")) {
-        wsEdit.replace(doc.uri, new Range(line, indentation, line, indentation + 2), "1. ");
-    } else if (/^\d\. /.test(lineTextContent)) {
-        wsEdit.replace(doc.uri, new Range(line, indentation + 1, line, indentation + 2), ")");
-    } else if (/^\d\) /.test(lineTextContent)) {
-        wsEdit.delete(doc.uri, new Range(line, indentation, line, indentation + 3));
-    } else {
-        wsEdit.insert(doc.uri, new Position(line, indentation), "- ");
-    }
+  if (lineTextContent.startsWith("- ")) {
+    wsEdit.replace(doc.uri, new Range(line, indentation, line, indentation + 2), "* ");
+  } else if (lineTextContent.startsWith("* ")) {
+    wsEdit.replace(doc.uri, new Range(line, indentation, line, indentation + 2), "+ ");
+  } else if (lineTextContent.startsWith("+ ")) {
+    wsEdit.replace(doc.uri, new Range(line, indentation, line, indentation + 2), "1. ");
+  } else if (/^\d\. /.test(lineTextContent)) {
+    wsEdit.replace(doc.uri, new Range(line, indentation + 1, line, indentation + 2), ")");
+  } else if (/^\d\) /.test(lineTextContent)) {
+    wsEdit.delete(doc.uri, new Range(line, indentation, line, indentation + 3));
+  } else {
+    wsEdit.insert(doc.uri, new Position(line, indentation), "- ");
+  }
 }
-
-// async function paste() {
-//     const editor = window.activeTextEditor;
-//     const selection = editor.selection;
-//     if (selection.isSingleLine && !isSingleLink(editor.document.getText(selection))) {
-//         const text = await env.clipboard.readText();
-//         if (isSingleLink(text)) {
-//             return commands.executeCommand("editor.action.insertSnippet", { "snippet": `[$TM_SELECTED_TEXT$0](${text})` });
-//         }
-//     }
-//     return commands.executeCommand("editor.action.clipboardPasteAction");
-// }
 
 /**
  * Creates Regexp to check if the text is a link (further detailes in the isSingleLink() documentation).
@@ -256,38 +287,38 @@ function toggleListSingleLine(doc: TextDocument, line: number, wsEdit: Workspace
  * @return Regexp
  */
 function createLinkRegex(): RegExp {
-    // unicode letters range(must not be a raw string)
-    const ul = '\\u00a1-\\uffff';
-    // IP patterns
-    const ipv4_re = '(?:25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}';
-    const ipv6_re = '\\[[0-9a-f:\\.]+\\]';  // simple regex (in django it is validated additionally)
+  // unicode letters range(must not be a raw string)
+  const ul = '\\u00a1-\\uffff';
+  // IP patterns
+  const ipv4_re = '(?:25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}';
+  const ipv6_re = '\\[[0-9a-f:\\.]+\\]';  // simple regex (in django it is validated additionally)
 
 
-    // Host patterns
-    const hostname_re = '[a-z' + ul + '0-9](?:[a-z' + ul + '0-9-]{0,61}[a-z' + ul + '0-9])?';
-    // Max length for domain name labels is 63 characters per RFC 1034 sec. 3.1
-    const domain_re = '(?:\\.(?!-)[a-z' + ul + '0-9-]{1,63})*';
+  // Host patterns
+  const hostname_re = '[a-z' + ul + '0-9](?:[a-z' + ul + '0-9-]{0,61}[a-z' + ul + '0-9])?';
+  // Max length for domain name labels is 63 characters per RFC 1034 sec. 3.1
+  const domain_re = '(?:\\.(?!-)[a-z' + ul + '0-9-]{1,63})*';
 
-    const tld_re = ''
-        + '\\.'                               // dot
-        + '(?!-)'                             // can't start with a dash
-        + '(?:[a-z' + ul + '-]{2,63}'         // domain label
-        + '|xn--[a-z0-9]{1,59})'              // or punycode label
-        // + '(?<!-)'                            // can't end with a dash
-        + '\\.?'                              // may have a trailing dot
-    ;
+  const tld_re = ''
+    + '\\.'                               // dot
+    + '(?!-)'                             // can't start with a dash
+    + '(?:[a-z' + ul + '-]{2,63}'         // domain label
+    + '|xn--[a-z0-9]{1,59})'              // or punycode label
+    // + '(?<!-)'                            // can't end with a dash
+    + '\\.?'                              // may have a trailing dot
+  ;
 
-    const host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)';
-    const pattern = ''
-        + '^(?:[a-z0-9\\.\\-\\+]*)://'  // scheme is not validated (in django it is validated additionally)
-        + '(?:[^\\s:@/]+(?::[^\\s:@/]*)?@)?'  // user: pass authentication
-        + '(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
-        + '(?::\\d{2,5})?'  // port
-        + '(?:[/?#][^\\s]*)?'  // resource path
-        + '$' // end of string
-    ;
+  const host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)';
+  const pattern = ''
+    + '^(?:[a-z0-9\\.\\-\\+]*)://'  // scheme is not validated (in django it is validated additionally)
+    + '(?:[^\\s:@/]+(?::[^\\s:@/]*)?@)?'  // user: pass authentication
+    + '(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
+    + '(?::\\d{2,5})?'  // port
+    + '(?:[/?#][^\\s]*)?'  // resource path
+    + '$' // end of string
+  ;
 
-    return new RegExp(pattern, 'i');
+  return new RegExp(pattern, 'i');
 }
 
 /**
@@ -300,167 +331,172 @@ function createLinkRegex(): RegExp {
  * @return boolean
  */
 export function isSingleLink(text: string): boolean {
-    return singleLinkRegex.test(text);
+  return singleLinkRegex.test(text);
 }
 
 function styleByWrapping(editor: TextEditor, startPattern: string, endPattern?: string) {
-    if (endPattern == undefined) {
-        endPattern = startPattern;
+  if (endPattern == undefined) {
+    endPattern = startPattern;
+  }
+
+  let selections = editor.selections;
+
+  let batchEdit = new WorkspaceEdit();
+  let shifts: [Position, number][] = [];
+  let newSelections: Selection[] = selections.slice();
+
+  selections.forEach((selection, i) => {
+    let cursorPos = selection.active;
+    const shift = shifts.map(([pos, s]) => (selection.start.line == pos.line && selection.start.character >= pos.character) ? s : 0)
+      .reduce((a, b) => a + b, 0);
+
+    if (selection.isEmpty) {
+      // No selected text
+      if (startPattern !== '~~' && getContext(editor, cursorPos, startPattern) === `${startPattern}text|${endPattern}`) {
+        // `**text|**` to `**text**|`
+        let newCursorPos = cursorPos.with({character: cursorPos.character + shift + endPattern.length});
+        newSelections[i] = new Selection(newCursorPos, newCursorPos);
+        return;
+      } else if (getContext(editor, cursorPos, startPattern) === `${startPattern}|${endPattern}`) {
+        // `**|**` to `|`
+        let start = cursorPos.with({character: cursorPos.character - startPattern.length});
+        let end = cursorPos.with({character: cursorPos.character + endPattern.length});
+        wrapRange(editor, batchEdit, shifts, newSelections, i, shift, cursorPos, new Range(start, end), false, startPattern);
+      } else {
+        // Select word under cursor
+        let wordRange = editor.document.getWordRangeAtPosition(cursorPos);
+        if (wordRange == undefined) {
+          wordRange = selection;
+        }
+        // One special case: toggle strikethrough in task list
+        const currentTextLine = editor.document.lineAt(cursorPos.line);
+        if (startPattern === '~~' && /^\s*[\*\+\-] (\[[ x]\] )? */g.test(currentTextLine.text)) {
+          wordRange = currentTextLine.range.with(new Position(cursorPos.line, currentTextLine.text.match(/^\s*[\*\+\-] (\[[ x]\] )? */g)[0].length));
+        }
+        wrapRange(editor, batchEdit, shifts, newSelections, i, shift, cursorPos, wordRange, false, startPattern);
+      }
+    } else {
+      // Text selected
+      wrapRange(editor, batchEdit, shifts, newSelections, i, shift, cursorPos, selection, true, startPattern);
     }
+  });
 
-    let selections = editor.selections;
+  const hasSelection = editor.selection && !editor.selection.isEmpty;
 
-    let batchEdit = new WorkspaceEdit();
-    let shifts: [Position, number][] = [];
-    let newSelections: Selection[] = selections.slice();
-
-    selections.forEach((selection, i) => {
-        let cursorPos = selection.active;
-        const shift = shifts.map(([pos, s]) => (selection.start.line == pos.line && selection.start.character >= pos.character) ? s : 0)
-            .reduce((a, b) => a + b, 0);
-
-        if (selection.isEmpty) {
-            // No selected text
-            if (startPattern !== '~~' && getContext(editor, cursorPos, startPattern) === `${startPattern}text|${endPattern}`) {
-                // `**text|**` to `**text**|`
-                let newCursorPos = cursorPos.with({character: cursorPos.character + shift + endPattern.length});
-                newSelections[i] = new Selection(newCursorPos, newCursorPos);
-                return;
-            } else if (getContext(editor, cursorPos, startPattern) === `${startPattern}|${endPattern}`) {
-                // `**|**` to `|`
-                let start = cursorPos.with({character: cursorPos.character - startPattern.length});
-                let end = cursorPos.with({character: cursorPos.character + endPattern.length});
-                wrapRange(editor, batchEdit, shifts, newSelections, i, shift, cursorPos, new Range(start, end), false, startPattern);
-            } else {
-                // Select word under cursor
-                let wordRange = editor.document.getWordRangeAtPosition(cursorPos);
-                if (wordRange == undefined) {
-                    wordRange = selection;
-                }
-                // One special case: toggle strikethrough in task list
-                const currentTextLine = editor.document.lineAt(cursorPos.line);
-                if (startPattern === '~~' && /^\s*[\*\+\-] (\[[ x]\] )? */g.test(currentTextLine.text)) {
-                    wordRange = currentTextLine.range.with(new Position(cursorPos.line, currentTextLine.text.match(/^\s*[\*\+\-] (\[[ x]\] )? */g)[0].length));
-                }
-                wrapRange(editor, batchEdit, shifts, newSelections, i, shift, cursorPos, wordRange, false, startPattern);
-            }
-        } else {
-            // Text selected
-            wrapRange(editor, batchEdit, shifts, newSelections, i, shift, cursorPos, selection, true, startPattern);
-        }
-    });
-
-    const hasSelection = editor.selection && !editor.selection.isEmpty;
-
-    return editor.applyEdit(batchEdit, newSelections).then(() => {
-        if (!hasSelection) {
-            editor.selections = newSelections;
-        }
-    });
+  return editor.applyEdit(batchEdit, newSelections).then(() => {
+    if (!hasSelection) {
+      editor.selections = newSelections;
+    }
+  });
 }
 
 /**
  * Add or remove `startPattern`/`endPattern` according to the context
- * @param editor
- * @param options The undo/redo behavior
- * @param cursor cursor position
- * @param range range to be replaced
- * @param isSelected is this range selected
- * @param startPtn
- * @param endPtn
  */
-function wrapRange(editor: TextEditor, wsEdit: WorkspaceEdit, shifts: [Position, number][], newSelections: Selection[], i: number, shift: number, cursor: Position, range: Range, isSelected: boolean, startPtn: string, endPtn?: string) {
-    if (endPtn == undefined) {
-        endPtn = startPtn;
-    }
+function wrapRange(
+  editor: TextEditor,
+  wsEdit: WorkspaceEdit,
+  shifts: [Position, number][],
+  newSelections: Selection[],
+  i: number,
+  shift: number,
+  cursor: Position,
+  range: Range,
+  isSelected: boolean,
+  startPtn: string,
+  endPtn?: string
+) {
+  if (endPtn == undefined) {
+    endPtn = startPtn;
+  }
 
-    let text = editor.document.getText(range);
-    const prevSelection = newSelections[i];
-    const ptnLength = (startPtn + endPtn).length;
+  let text = editor.document.getText(range);
+  const prevSelection = newSelections[i];
+  const ptnLength = (startPtn + endPtn).length;
 
-    let newCursorPos = cursor.with({character: cursor.character + shift});
-    let newSelection: Selection;
-    if (isWrapped(text, startPtn)) {
-        // remove start/end patterns from range
-        wsEdit.replace(editor.document.uri, range, text.substr(startPtn.length, text.length - ptnLength));
+  let newCursorPos = cursor.with({character: cursor.character + shift});
+  let newSelection: Selection;
+  if (isWrapped(text, startPtn)) {
+    // remove start/end patterns from range
+    wsEdit.replace(editor.document.uri, range, text.substr(startPtn.length, text.length - ptnLength));
 
-        shifts.push([range.end, -ptnLength]);
+    shifts.push([range.end, -ptnLength]);
 
-        // Fix cursor position
-        if (!isSelected) {
-            if (!range.isEmpty) { // means quick styling
-                if (cursor.character == range.end.character) {
-                    newCursorPos = cursor.with({character: cursor.character + shift - ptnLength});
-                } else {
-                    newCursorPos = cursor.with({character: cursor.character + shift - startPtn.length});
-                }
-            } else { // means `**|**` -> `|`
-                newCursorPos = cursor.with({character: cursor.character + shift + startPtn.length});
-            }
-            newSelection = new Selection(newCursorPos, newCursorPos);
+    // Fix cursor position
+    if (!isSelected) {
+      if (!range.isEmpty) { // means quick styling
+        if (cursor.character == range.end.character) {
+          newCursorPos = cursor.with({character: cursor.character + shift - ptnLength});
         } else {
-            newSelection = new Selection(
-                prevSelection.start.with({character: prevSelection.start.character + shift}),
-                prevSelection.end.with({character: prevSelection.end.character + shift - ptnLength})
-            );
+          newCursorPos = cursor.with({character: cursor.character + shift - startPtn.length});
         }
+      } else { // means `**|**` -> `|`
+        newCursorPos = cursor.with({character: cursor.character + shift + startPtn.length});
+      }
+      newSelection = new Selection(newCursorPos, newCursorPos);
     } else {
-        // add start/end patterns around range
-        wsEdit.replace(editor.document.uri, range, startPtn + text + endPtn);
-
-        shifts.push([range.end, ptnLength]);
-
-        // Fix cursor position
-        if (!isSelected) {
-            if (!range.isEmpty) { // means quick styling
-                if (cursor.character == range.end.character) {
-                    newCursorPos = cursor.with({character: cursor.character + shift + ptnLength});
-                } else {
-                    newCursorPos = cursor.with({character: cursor.character + shift + startPtn.length});
-                }
-            } else { // means `|` -> `**|**`
-                newCursorPos = cursor.with({character: cursor.character + shift + startPtn.length});
-            }
-            newSelection = new Selection(newCursorPos, newCursorPos);
-        } else {
-            newSelection = new Selection(
-                prevSelection.start.with({character: prevSelection.start.character + shift}),
-                prevSelection.end.with({character: prevSelection.end.character + shift + ptnLength})
-            );
-        }
+      newSelection = new Selection(
+        prevSelection.start.with({character: prevSelection.start.character + shift}),
+        prevSelection.end.with({character: prevSelection.end.character + shift - ptnLength})
+      );
     }
+  } else {
+    // add start/end patterns around range
+    wsEdit.replace(editor.document.uri, range, startPtn + text + endPtn);
 
-    newSelections[i] = newSelection;
+    shifts.push([range.end, ptnLength]);
+
+    // Fix cursor position
+    if (!isSelected) {
+      if (!range.isEmpty) { // means quick styling
+        if (cursor.character == range.end.character) {
+          newCursorPos = cursor.with({character: cursor.character + shift + ptnLength});
+        } else {
+          newCursorPos = cursor.with({character: cursor.character + shift + startPtn.length});
+        }
+      } else { // means `|` -> `**|**`
+        newCursorPos = cursor.with({character: cursor.character + shift + startPtn.length});
+      }
+      newSelection = new Selection(newCursorPos, newCursorPos);
+    } else {
+      newSelection = new Selection(
+        prevSelection.start.with({character: prevSelection.start.character + shift}),
+        prevSelection.end.with({character: prevSelection.end.character + shift + ptnLength})
+      );
+    }
+  }
+
+  newSelections[i] = newSelection;
 }
 
 function isWrapped(text: string, startPattern: string, endPattern?: string): boolean {
-    if (endPattern == undefined) {
-        endPattern = startPattern;
-    }
-    return text.startsWith(startPattern) && text.endsWith(endPattern);
+  if (endPattern == undefined) {
+    endPattern = startPattern;
+  }
+  return text.startsWith(startPattern) && text.endsWith(endPattern);
 }
 
 function getContext(editor: TextEditor, cursorPos: Position, startPattern: string, endPattern?: string): string {
-    if (endPattern == undefined) {
-        endPattern = startPattern;
+  if (endPattern == undefined) {
+    endPattern = startPattern;
+  }
+
+  let startPositionCharacter = cursorPos.character - startPattern.length;
+  let endPositionCharacter = cursorPos.character + endPattern.length;
+
+  if (startPositionCharacter < 0) {
+    startPositionCharacter = 0;
+  }
+
+  let leftText = editor.document.getText(new Range(cursorPos.line, startPositionCharacter, cursorPos.line, cursorPos.character));
+  let rightText = editor.document.getText(new Range(cursorPos.line, cursorPos.character, cursorPos.line, endPositionCharacter));
+
+  if (rightText == endPattern) {
+    if (leftText == startPattern) {
+      return `${startPattern}|${endPattern}`;
+    } else {
+      return `${startPattern}text|${endPattern}`;
     }
-
-    let startPositionCharacter = cursorPos.character - startPattern.length;
-    let endPositionCharacter = cursorPos.character + endPattern.length;
-
-    if (startPositionCharacter < 0) {
-        startPositionCharacter = 0;
-    }
-
-    let leftText = editor.document.getText(new Range(cursorPos.line, startPositionCharacter, cursorPos.line, cursorPos.character));
-    let rightText = editor.document.getText(new Range(cursorPos.line, cursorPos.character, cursorPos.line, endPositionCharacter));
-
-    if (rightText == endPattern) {
-        if (leftText == startPattern) {
-            return `${startPattern}|${endPattern}`;
-        } else {
-            return `${startPattern}text|${endPattern}`;
-        }
-    }
-    return '|';
+  }
+  return '|';
 }
