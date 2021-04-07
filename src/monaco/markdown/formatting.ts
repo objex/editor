@@ -13,10 +13,10 @@ export function activateFormatting(editor: TextEditor, monaco: typeof window.mon
   addKeybinding(editor, "toggleHeadingUp", toggleHeadingUp, [monaco.KeyMod.WinCtrl | monaco.KeyMod.Shift | monaco.KeyCode.US_CLOSE_SQUARE_BRACKET], "Heading up");
   addKeybinding(editor, "toggleHeadingDown", toggleHeadingDown, [monaco.KeyMod.WinCtrl | monaco.KeyMod.Shift | monaco.KeyCode.US_OPEN_SQUARE_BRACKET], "Heading down");
 
-  addKeybinding(editor, "toggleHeading1", toggleAtLineStart('# '), [], "Toggle Heading 1");
-  addKeybinding(editor, "toggleHeading2", toggleAtLineStart('## '), [], "Toggle Heading 2");
-  addKeybinding(editor, "toggleHeading3", toggleAtLineStart('### '), [], "Toggle Heading 3");
-  addKeybinding(editor, "toggleHeading4", toggleAtLineStart('#### '), [], "Toggle Heading 3");
+  addKeybinding(editor, "toggleHeading1", toggleAtLineStart('# ', ['# ', '## ', '### ', '#### ']), [], "Toggle Heading 1");
+  addKeybinding(editor, "toggleHeading2", toggleAtLineStart('## ', ['# ', '## ', '### ', '#### ']), [], "Toggle Heading 2");
+  addKeybinding(editor, "toggleHeading3", toggleAtLineStart('### ', ['# ', '## ', '### ', '#### ']), [], "Toggle Heading 3");
+  addKeybinding(editor, "toggleHeading4", toggleAtLineStart('#### ', ['# ', '## ', '### ', '#### ']), [], "Toggle Heading 3");
 
   addKeybinding(editor, "toggleList", toggleList, [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_L], "Toggle list");
   addKeybinding(editor, "toggleUnorderedList", toggleAtLineStart('* ', ['+ ', '- ']), [], "Toggle unordered list");
