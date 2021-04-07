@@ -19,7 +19,7 @@ function executeAction(actionId: string) {
 
 export function renderToolbar() {
   return (
-    <div class="flex item-center py-1.5 px-4 bg-gray-100 space-x-1.5">
+    <div class="flex item-center p-1.5 bg-gray-100 space-x-1.5">
       <button x-on:click={executeAction('toggleBold')} class="p-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">
         <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round">
@@ -116,6 +116,15 @@ export function renderToolbar() {
         <svg class="h-5 w-5" fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7">
           <path d="M16.667 10.833l-3.334 3.334m0-3.334l3.334 3.334-3.334-3.334zM16.667 4.167h-5.834L7.5 15.833l-2.5-5H3.333"/>
         </svg>
+      </button>
+
+      <div class="flex-1" />
+
+      <button class="flex items-center space-x-2 rounded py-0.5 px-2 text-gray-500 hover:bg-gray-200 transition duration-100">
+        <svg class="w-5" viewBox="0 0 23 20" fill="currentColor">
+          <path d="M20.833 16.672c0 .457-.37.828-.826.828H3.327a.828.828 0 01-.827-.828.84.84 0 01.84-.839h15.827v-9.75l-6.869 5.495a1 1 0 01-1.258-.007L2.867 4.883A1 1 0 012.5 4.11v-.776c0-.46.373-.833.833-.833H20c.46 0 .833.373.833.833v13.34zM4.528 4.167l7.139 5.675 7.138-5.675H4.528zM0 13.333c0-.46.373-.833.833-.833h5.834a.833.833 0 010 1.667H.833A.833.833 0 010 13.333zm0-4.166c0-.46.373-.834.833-.834h3.334a.833.833 0 010 1.667H.833A.833.833 0 010 9.167z"/>
+        </svg>
+        <span class="text-sm font-medium">Publish</span>
       </button>
     </div>
   )
