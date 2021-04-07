@@ -100,19 +100,19 @@ export function renderToolbar() {
         <div class="w-px h-full bg-gray-300 mx-2"/>
       </div>
 
-      <button x-on:click={executeAction('insertImage')} class="p-0.5 rounded text-gray-500 hover:bg-gray-200 transition duration-100">
+      <button x-on:click={executeAction('insertImage')} class="py-0.5 px-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">
         <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
           <path d="M12.5 6.667h.008M14.167 3.333H5.833a2.5 2.5 0 00-2.5 2.5v8.334a2.5 2.5 0 002.5 2.5h8.334a2.5 2.5 0 002.5-2.5V5.833a2.5 2.5 0 00-2.5-2.5z"/>
           <path d="M3.333 12.5l3.334-3.333c.38-.366.81-.559 1.25-.559.438 0 .87.193 1.25.559l4.166 4.166"/>
           <path d="M11.667 11.667l.833-.834c.38-.365.811-.558 1.25-.558.439 0 .87.193 1.25.558l1.667 1.667"/>
         </svg>
       </button>
-      <button x-on:click={executeAction('toggleCodeSpan')} class="p-0.5 rounded text-gray-500 hover:bg-gray-200 transition duration-100">
+      <button x-on:click={executeAction('toggleCodeSpan')} class="py-0.5 px-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">
         <svg class="h-5 w-5" fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7">
           <path d="M5.833 6.667L2.5 10l3.333 3.333M14.167 6.667L17.5 10l-3.333 3.333M11.667 3.333L8.333 16.667"/>
         </svg>
       </button>
-      <button x-on:click={executeAction('toggleMathReverse')} class="p-0.5 rounded text-gray-500 hover:bg-gray-200 transition duration-100">
+      <button x-on:click={executeAction('toggleMathReverse')} class="py-0.5 px-1 rounded text-gray-500 hover:bg-gray-200 transition duration-100">
         <svg class="h-5 w-5" fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7">
           <path d="M16.667 10.833l-3.334 3.334m0-3.334l3.334 3.334-3.334-3.334zM16.667 4.167h-5.834L7.5 15.833l-2.5-5H3.333"/>
         </svg>

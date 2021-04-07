@@ -1,5 +1,4 @@
 const {app, Menu, dialog, BrowserWindow} = require('electron').remote;
-const {ipcRenderer} = require('electron');
 const fs = require('fs');
 // const isDev = require('electron-is-dev');
 
@@ -79,9 +78,8 @@ const template = [
             return;
           }
 
-          const oldModel = window.model;
           window.model = window.monaco.editor.createModel('', 'pymarkdown');
-          oldModel.dispose();
+          window.editor.setModel(window.model);
         }
       },
       {
