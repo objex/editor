@@ -2,8 +2,7 @@ const {remote} = require('electron');
 
 
 function setOSTheme() {
-    let theme = remote.nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
-    window.localStorage.osTheme = theme
+    window.localStorage.osTheme = remote.nativeTheme.shouldUseDarkColors ? 'dark' : 'light'
 
     if (window.__setTheme) {
         window.__setTheme();

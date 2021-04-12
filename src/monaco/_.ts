@@ -1,6 +1,6 @@
 export function loadScript(url: string) {
     return new Promise<void>((resolve, reject) => {
-        var script = document.createElement('script');
+        let script = document.createElement('script');
         script.onload = () => {
             resolve();
         };
@@ -19,6 +19,5 @@ export function loadMonaco() {
         loadScript('./node_modules/monaco-editor/min/vs/loader.js'),
         loadScript('./node_modules/monaco-editor/min/vs/editor/editor.main.nls.js'),
         loadScript('./node_modules/monaco-editor/min/vs/editor/editor.main.js'),
-        // loadScript('./node_modules/monaco-markdown/umd/monaco-markdown.js'),
     ]);
 }

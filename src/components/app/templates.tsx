@@ -1,6 +1,6 @@
 import {h} from "../../utils"
 import {addTab, mountTabs} from "../tabs";
-import {renderAppBar} from "../appBar";
+// import {renderAppBar} from "../appBar";
 import {renderToolbar} from "../toolbar";
 import {mountMonacoEditor} from '../../monaco';
 import Split from 'split.js'
@@ -10,9 +10,9 @@ tabs$.subscribe();
 addTab({name: "Home", closable: false});
 
 export function renderApp() {
-  let editorEl = <div class="w-full" style="height: calc(100vh - 84px)"/>;
+  let editorEl = <div class="w-full" style="height: calc(100vh - 40px)"/>; // 84px;
   let previewEl = <article class="px-4 md-content__inner md-typeset max-w-screen-md mx-auto"/>;
-  let previewElWrapper = <div class="w-full overflow-y-auto" style="height: calc(100vh - 84px)">
+  let previewElWrapper = <div class="w-full overflow-y-auto" style="height: calc(100vh - 40px)">
       {previewEl}
   </div>;
 
@@ -28,7 +28,7 @@ export function renderApp() {
 
   return (
     <div>
-      {renderAppBar({tabs$})}
+      {/*{renderAppBar({tabs$})}*/}
       {renderToolbar()}
       <div class="flex relative">
         {editorEl}
