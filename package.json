@@ -43,5 +43,17 @@
     "monaco-markdown": "^0.0.11",
     "rxjs": "^6.6.6",
     "split.js": "^1.6.2"
+  },
+  "build": {
+    "appId": "tech.objex.editor",
+    "mac": {
+      "category": "public.app-category.productivity"
+    },
+    "protocols": {
+      "name": "objex-editor-protocol",
+      "schemes": [
+        "objex-editor"
+      ]
+    }
   }
 }

@@ -1,6 +1,6 @@
-const {app, Menu, dialog, BrowserWindow} = require('electron').remote;
+const {app, Menu, dialog, BrowserWindow, shell} = require('electron').remote;
 const fs = require('fs');
-// const isDev = require('electron-is-dev');
+
 
 /**
  * Just a hack to replace uri of existing model without losing the undo redo stack
@@ -160,6 +160,20 @@ const template = [
             currentWindow.setTitle(path + ' -- Objex Editor');
             setModelUri('file://' + path);
           }
+        }
+      },
+      {type: 'separator'},
+      {
+        label: 'Login with Rabbito...',
+        click: () => {
+          shell.openExternal("http://localhost:4200/authenticate-editor");
+        }
+      },
+      {
+        label: 'Logout',
+        click: () => {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('blogSlug');
         }
       },
       {type: 'separator'},

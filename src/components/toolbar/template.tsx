@@ -1,4 +1,5 @@
 import {h} from '../../utils'
+import {publishToRabbito} from "../../rabbito";
 
 function executeAction(actionId: string) {
   return async () => {
@@ -120,7 +121,7 @@ export function renderToolbar() {
 
       <div class="flex-1" />
 
-      <button class="flex items-center space-x-2 rounded py-0.5 px-2 text-gray-500 hover:bg-gray-200 transition duration-100">
+      <button x-on:click={publishToRabbito} class="flex items-center space-x-2 rounded py-0.5 px-2 text-gray-500 hover:bg-gray-200 transition duration-100">
         <svg class="w-5" viewBox="0 0 23 20" fill="currentColor">
           <path d="M20.833 16.672c0 .457-.37.828-.826.828H3.327a.828.828 0 01-.827-.828.84.84 0 01.84-.839h15.827v-9.75l-6.869 5.495a1 1 0 01-1.258-.007L2.867 4.883A1 1 0 012.5 4.11v-.776c0-.46.373-.833.833-.833H20c.46 0 .833.373.833.833v13.34zM4.528 4.167l7.139 5.675 7.138-5.675H4.528zM0 13.333c0-.46.373-.833.833-.833h5.834a.833.833 0 010 1.667H.833A.833.833 0 010 13.333zm0-4.166c0-.46.373-.834.833-.834h3.334a.833.833 0 010 1.667H.833A.833.833 0 010 9.167z"/>
         </svg>
