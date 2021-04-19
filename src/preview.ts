@@ -19,7 +19,9 @@ content$
   .pipe(
     debounceTime(250),
     switchMap((text: string) => {
-      return from(parseMarkdown(text));
+      const basePath = window.model.uri.fsPath.split('/').slice(0, -1).join('/');
+
+      return from(parseMarkdown(text, basePath));
     }),
     observeOn(animationFrameScheduler)
   )
