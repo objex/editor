@@ -70,10 +70,10 @@ if (this_is_more_code == true && !indented) {
 }
 ~~~
 
-Text with
-two trailing spaces
-(on the right)
-can be used
+Text with  
+two trailing spaces  
+(on the right)  
+can be used  
 for things like poems
 
 ### Horizontal rules

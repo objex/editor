@@ -2,6 +2,7 @@ import { loadMonaco } from "./_";
 import { getTheme } from './theme';
 import { registerMarkdown, MonacoMarkdownExtension } from './markdown';
 import {getInitialTextModel} from "./initialTextModel";
+const {BrowserWindow} = require('electron').remote;
 
 export async function mountMonacoEditor(editorEl: HTMLElement) {
     await loadMonaco();
@@ -47,6 +48,9 @@ export async function mountMonacoEditor(editorEl: HTMLElement) {
     window.model = getInitialTextModel();
     editor.setModel(window.model);
     // window.model.
+
+    const currentWindow = BrowserWindow.getFocusedWindow();
+    currentWindow.setTitle('Untitled -- Objex Editor');
 
     /* ----------------------------
      * Activate Markdown Extension
