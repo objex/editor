@@ -1,3 +1,5 @@
+import {mountPreview} from "./preview";
+
 const {app, Menu, dialog, BrowserWindow, shell} = require('electron').remote;
 const fs = require('fs');
 
@@ -33,6 +35,8 @@ function setModelUri(path: string) {
   window.model = newModel;
   window.editor.setModel(newModel);
   oldModel.dispose();
+
+  mountPreview(window.model);
 }
 
 const fileFilters = [
@@ -80,6 +84,8 @@ const template = [
 
           window.model = window.monaco.editor.createModel('', 'pymarkdown');
           window.editor.setModel(window.model);
+
+          mountPreview(window.model);
         }
       },
       {
@@ -104,8 +110,9 @@ const template = [
 
             window.model = editor.createModel(data, 'pymarkdown', Uri.parse('file://' + path[0]));
             window.editor.setModel(window.model);
-
             oldModel.dispose();
+
+            mountPreview(window.model);
 
             currentWindow.setTitle(path + ' -- Objex Editor');
           }
