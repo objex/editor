@@ -2,6 +2,7 @@ const {nodeResolve} = require('@rollup/plugin-node-resolve');
 const typescript = require('rollup-plugin-typescript2');
 const postcss = require('rollup-plugin-postcss');
 const commonjs = require('@rollup/plugin-commonjs');
+const json = require('@rollup/plugin-json');
 const path = require('path');
 
 const {inputDir, outputDir} = require('./_config')
@@ -12,9 +13,11 @@ const inputOptions = [
     input: path.join(inputDir, 'renderer.ts'),
     external: ['./build/pyodide.js'],
     plugins: [
+      //
       postcss(),
       nodeResolve(),
       commonjs(),
+      json(),
       typescript(),
     ],
   },
