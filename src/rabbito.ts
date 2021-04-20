@@ -1,7 +1,21 @@
 const {shell} = require('electron');
 const {ipcRenderer} = require('electron');
+const fsPromises = require('fs').promises;
+const path = require('path');
 
 let publishing = false;
+
+export function getImages(markdown: string, filePath: string) {
+  const images = markdown.matchAll(/!\[[^\]]*]\((.*?)(?=[")])(".*")?\)/g);
+  const files = [];
+  const basePath = filePath.split('/').slice(0, -1).join('/');
+
+  for (let image of images) {
+    files.push([image[1], path.join(basePath, image[1])]);
+  }
+
+  return files;
+}
 
 export async function publishToRabbito() {
   if (!window.model) return;
@@ -16,11 +30,17 @@ export async function publishToRabbito() {
   }
   publishing = false;
 
+  const formData = new FormData();
+
   const markdownFile = new Blob([window.model.getValue()], {
     type: 'text/plain'
   });
 
-  const formData = new FormData();
+  const images = getImages(window.model.getValue(), window.model.uri.fsPath);
+  for (let image of images) {
+    const file = await fsPromises.readFile(image[1]);
+    formData.append(image[0].split('.')[0], new Blob([file]), image[0]);
+  }
   formData.append('markdown', markdownFile, "markdown.md");
 
   const xml = new XMLHttpRequest();
