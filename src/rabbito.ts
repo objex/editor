@@ -25,7 +25,7 @@ export async function publishToRabbito() {
 
   if (!authToken || !blogSlug) {
     publishing = true;
-    shell.openExternal("http://localhost:4200/authenticate-editor");
+    shell.openExternal("http://dev.rabbito.io/authenticate-editor");
     return;
   }
   publishing = false;
