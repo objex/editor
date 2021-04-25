@@ -2,6 +2,7 @@ const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('path');
 
 let i = 1;
+let windows = [];
 function createWindow(setInitialText=false) {
   const window = new BrowserWindow({
     // titleBarStyle: 'hidden',
@@ -28,11 +29,25 @@ function createWindow(setInitialText=false) {
       setInitialText: setInitialText,
     }
   })
+
+  window.on('closed', () => {
+    const i = windows.indexOf(window);
+    if (i > -1) {
+      windows.splice(i, 1);
+    }
+  });
+
+  windows.push(window);
 }
 
-ipcMain.on('new-window', () => {
-  createWindow();
-})
+app.on('open-url', function (event, data) {
+  for (let window of windows) {
+    if (window.webContents) {
+      window.webContents.send('authToken', {data});
+    }
+  }
+});
+app.setAsDefaultProtocolClient('objex-editor');
 
 app.on("ready", () => {
   createWindow(true);

@@ -1,7 +1,8 @@
-const {app, Menu, dialog, BrowserWindow} = require('electron').remote;
-const {ipcRenderer} = require('electron');
+import {mountPreview} from "./preview";
+
+const {app, Menu, dialog, BrowserWindow, shell} = require('electron').remote;
 const fs = require('fs');
-// const isDev = require('electron-is-dev');
+
 
 /**
  * Just a hack to replace uri of existing model without losing the undo redo stack
@@ -34,6 +35,8 @@ function setModelUri(path: string) {
   window.model = newModel;
   window.editor.setModel(newModel);
   oldModel.dispose();
+
+  mountPreview(window.model);
 }
 
 const fileFilters = [
@@ -79,9 +82,10 @@ const template = [
             return;
           }
 
-          const oldModel = window.model;
           window.model = window.monaco.editor.createModel('', 'pymarkdown');
-          oldModel.dispose();
+          window.editor.setModel(window.model);
+
+          mountPreview(window.model);
         }
       },
       {
@@ -106,8 +110,9 @@ const template = [
 
             window.model = editor.createModel(data, 'pymarkdown', Uri.parse('file://' + path[0]));
             window.editor.setModel(window.model);
-
             oldModel.dispose();
+
+            mountPreview(window.model);
 
             currentWindow.setTitle(path + ' -- Objex Editor');
           }
@@ -162,6 +167,20 @@ const template = [
             currentWindow.setTitle(path + ' -- Objex Editor');
             setModelUri('file://' + path);
           }
+        }
+      },
+      {type: 'separator'},
+      {
+        label: 'Login with Rabbito...',
+        click: () => {
+          shell.openExternal("http://localhost:4200/authenticate-editor");
+        }
+      },
+      {
+        label: 'Logout',
+        click: () => {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('blogSlug');
         }
       },
       {type: 'separator'},

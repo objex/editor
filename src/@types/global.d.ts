@@ -7,6 +7,8 @@ declare global {
         monaco?: typeof monaco;
         editor?: monaco.editor.IStandaloneCodeEditor;
         model?: monaco.editor.ITextModel;
+
+        previewEl: HTMLElement;
         __setTheme?: () => void;
     }    
 }

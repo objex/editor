@@ -18,19 +18,20 @@ const mdExtensions = [
     'pymdownx.superfences',
     'pymdownx.tasklist',
     'pymdownx.tilde',
-    // 'pymdownx.pathconverter',
+    'pymdownx.pathconverter',
     'admonition',
     'meta',
     'codehilite',
     'tables',
 ];
 
-const mdExtensionsConfig = {
-    // 'pymdownx.pathconverter': {
-    //     'base_path': '/GCS/POST_STORAGE_BUCKET/BLOG_NAME/POST_SLUG/',
-    //     'absolute': true,
-    //     'tags': 'img',
-    // },
+const mdExtensionsConfig = (path = '') => ({
+    'pymdownx.pathconverter': {
+        'base_path': path,
+        'relative_path': path,
+        'absolute': true,
+        'tags': 'img',
+    },
     'toc': {
         'marker': '',
         'permalink': true,
@@ -44,21 +45,21 @@ const mdExtensionsConfig = {
     'pymdownx.tasklist': {
         'custom_checkbox': 'true',
     }
-}
+});
 
 export async function loadMarkdownParser() {
     pyodide = await loadPyodide({ indexURL: './dist/pyodide/build/' });
     await pyodide.runPythonAsync(`
     from markdown import Markdown
-    import json
-
-    MD_EXTENSIONS = ${JSON.stringify(mdExtensions)}
-    MD_EXTENSIONS_CONFIG = json.loads('${JSON.stringify(mdExtensionsConfig)}')
-    `);
+    import json`);
 }
 
-export function parseMarkdown(markdown: string): Promise<string> {
+export function parseMarkdown(markdown: string, basePath = ''): Promise<string> {
+    console.log(JSON.stringify(mdExtensionsConfig(basePath)));
     return pyodide.runPythonAsync(`
+MD_EXTENSIONS = ${JSON.stringify(mdExtensions)}
+MD_EXTENSIONS_CONFIG = json.loads('${JSON.stringify(mdExtensionsConfig(basePath))}')
+
 md = Markdown(extensions=MD_EXTENSIONS, extension_configs=MD_EXTENSIONS_CONFIG)
 md.convert("""${markdown.replace(/\\/g, '\\\\')}""")`,
         () => { },
